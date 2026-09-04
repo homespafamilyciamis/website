@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Spa Family - Kenyamanan Spa di Rumah Anda</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-content">
+            <div class="logo">
+                <i class="fas fa-leaf"></i>
+                <span>HOME SPA FAMILY</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#layanan">Layanan Kami</a></li>
+                <li><a href="#paket">Paket Keluarga</a></li>
+                <li><a href="#blog">Blog</a></li>
+                <li><a href="#tentang">Tentang Kami</a></li>
+                <li><a href="#kontak">Kontak</a></li>
+            </ul>
+            <button class="btn-pesan">PESAN SEKARANG</button>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container with Sidebar -->
+    <div class="main-wrapper">
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <h1>KENYAMANAN SPA<br>TERBAIK DI RUMAH ANDA</h1>
+                <p>Relax • Refresh • Rejuvenate</p>
+                <button class="btn-primary" onclick="document.querySelector('.booking-sidebar').scrollIntoView({behavior: 'smooth'})">LIHAT LAYANAN KAMI</button>
+            </div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1544161515-81205f8abecc?w=600&h=500&fit=crop" alt="Happy Family at Home Spa">
+            </div>
+        </section>
+
+        <!-- Layanan Kami Section -->
+        <section id="layanan" class="layanan-section">
+            <div class="container">
+                <h2>LAYANAN KAMI</h2>
+                <div class="layanan-grid">
+                    <div class="layanan-card">
+                        <div class="layanan-icon">
+                            <i class="fas fa-person-hiking"></i>
+                        </div>
+                        <h3>Pijat Keluarga</h3>
+                        <p>Relaxing Family Massage</p>
+                        <div class="harga">Rp 350rb/60mnt</div>
+                    </div>
+                    <div class="layanan-card">
+                        <div class="layanan-icon">
+                            <i class="fas fa-baby"></i>
+                        </div>
+                        <h3>Spa Anak</h3>
+                        <p>Kids Pamper</p>
+                        <div class="harga">Rp 200rb/45mnt</div>
+                    </div>
+                    <div class="layanan-card">
+                        <div class="layanan-icon">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h3>Pijat Ibu Hamil</h3>
+                        <p>Pregnancy Massage</p>
+                        <div class="harga">Rp 400rb/75mnt</div>
+                    </div>
+                    <div class="layanan-card">
+                        <div class="layanan-icon">
+                            <i class="fas fa-face-smile"></i>
+                        </div>
+                        <h3>Perawatan Wajah & Tubuh</h3>
+                        <p>Facial & Body Scrub</p>
+                        <div class="harga">Rp 250rb/50mnt</div>
+                    </div>
+                    <div class="layanan-card">
+                        <div class="layanan-icon">
+                            <i class="fas fa-spa"></i>
+                        </div>
+                        <h3>Paket Pasangan</h3>
+                        <p>Couples Retreat</p>
+                        <div class="harga">Rp 650rb/90mnt</div>
+                    </div>
+                    <div class="layanan-card">
+                        <div class="layanan-icon">
+                            <i class="fas fa-hand-sparkles"></i>
+                        </div>
+                        <h3>Manicure & Pedicure</h3>
+                        <p>Nail Care</p>
+                        <div class="harga">Rp 180rb</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Paket Populer Section -->
+        <section id="paket" class="paket-section">
+            <div class="container">
+                <h2>PAKET POPULER</h2>
+                <div class="paket-grid">
+                    <div class="paket-card">
+                        <img src="https://images.unsplash.com/photo-1540555700478-69a0ba36cd93?w=400&h=300&fit=crop" alt="Paket Ceria Keluarga">
+                        <h3>Paket Ceria Keluarga</h3>
+                        <p>Body Massage + Facial</p>
+                        <div class="harga">Rp 850rb</div>
+                    </div>
+                    <div class="paket-card">
+                        <img src="https://images.unsplash.com/photo-1600334089393-b70033dbe930?w=400&h=300&fit=crop" alt="Paket Ceria Keluarga">
+                        <h3>Paket Ceria Keluarga</h3>
+                        <p>Body Massage + Facial</p>
+                        <div class="harga">Rp 850rb</div>
+                    </div>
+                    <div class="paket-card">
+                        <img src="https://images.unsplash.com/photo-1597270797387-68b34ec6537f?w=400&h=300&fit=crop" alt="Paket Body Paangan">
+                        <h3>Paket Body Paangan</h3>
+                        <p>Full Body Massage</p>
+                        <div class="harga">Rp 550rb/60mnt</div>
+                    </div>
+                    <div class="paket-card">
+                        <img src="https://images.unsplash.com/photo-1605655014175-c1cbc1d36692?w=400&h=300&fit=crop" alt="Manicure & Pedicure">
+                        <h3>Manicure & Pedicure</h3>
+                        <p>Nail & Foot Care</p>
+                        <div class="harga">Rp 280rb</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tentang Kami Section -->
+        <section id="tentang" class="tentang-section">
+            <div class="container">
+                <h2>TENTANG KAMI</h2>
+                <div class="tentang-content">
+                    <div class="tentang-image">
+                        <img src="https://images.unsplash.com/photo-1600334089393-b70033dbe930?w=500&h=400&fit=crop" alt="Tentang Home Spa Family">
+                    </div>
+                    <div class="tentang-text">
+                        <h3>Mengapa Memilih Home Spa Family?</h3>
+                        <ul class="fitur-list">
+                            <li><i class="fas fa-check-circle"></i> Terapis berpengalaman dan berlisensi</li>
+                            <li><i class="fas fa-check-circle"></i> Produk spa berkualitas premium</li>
+                            <li><i class="fas fa-check-circle"></i> Peralatan higienis dan steril</li>
+                            <li><i class="fas fa-check-circle"></i> Nyaman & privat di rumah Anda</li>
+                            <li><i class="fas fa-check-circle"></i> Pelayanan ramah & terpercaya</li>
+                            <li><i class="fas fa-check-circle"></i> Harga kompetitif & transparan</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Blog Section -->
+        <section id="blog" class="blog-section">
+            <div class="container">
+                <h2>BLOG & TIPS</h2>
+                <div class="blog-grid">
+                    <article class="blog-card">
+                        <img src="https://images.unsplash.com/photo-1544161515-81205f8abecc?w=400&h=250&fit=crop" alt="Blog">
+                        <h3>Manfaat Pijat Rutin untuk Kesehatan</h3>
+                        <p>Discover the amazing benefits of regular massage therapy for your health and wellness...</p>
+                        <a href="#" class="read-more">Baca Selengkapnya →</a>
+                    </article>
+                    <article class="blog-card">
+                        <img src="https://images.unsplash.com/photo-1600334089393-b70033dbe930?w=400&h=250&fit=crop" alt="Blog">
+                        <h3>Tips Perawatan Kulit di Rumah</h3>
+                        <p>Learn simple tips and tricks to take care of your skin at home with our expert guidance...</p>
+                        <a href="#" class="read-more">Baca Selengkapnya →</a>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Kontak Section -->
+        <section id="kontak" class="kontak-section">
+            <div class="container">
+                <h2>HUBUNGI KAMI</h2>
+                <div class="kontak-content">
+                    <div class="kontak-info">
+                        <div class="info-item">
+                            <i class="fas fa-phone"></i>
+                            <h3>WhatsApp</h3>
+                            <p><a href="https://wa.me/6283195585892" target="_blank">0831-9558-5892</a></p>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <h3>Lokasi</h3>
+                            <p>Jakarta, Bogor, Depok, Tangerang</p>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-envelope"></i>
+                            <h3>Email</h3>
+                            <p>help@homespafamily.com</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Sidebar Booking -->
+    <aside class="booking-sidebar">
+        <div class="sidebar-header">
+            <h3>BOOKING ONLINE</h3>
+        </div>
+        <form id="booking-form" onsubmit="submitBooking(event)" class="booking-form">
+            <div class="form-group">
+                <label>Pilih Layanan</label>
+                <select id="service" required onchange="updatePrice()">
+                    <option value="">-- Pilih --</option>
+                    <option value="Pijat Keluarga|350">Pijat Keluarga - Rp 350rb</option>
+                    <option value="Spa Anak|200">Spa Anak - Rp 200rb</option>
+                    <option value="Pijat Ibu Hamil|400">Pijat Ibu Hamil - Rp 400rb</option>
+                    <option value="Perawatan Wajah|250">Perawatan Wajah - Rp 250rb</option>
+                    <option value="Paket Pasangan|650">Paket Pasangan - Rp 650rb</option>
+                    <option value="Manicure & Pedicure|180">Manicure & Pedicure - Rp 180rb</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Tanggal (Kalender)</label>
+                <input type="date" id="tanggal" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Waktu (Jam)</label>
+                    <input type="time" id="jam" required>
+                </div>
+                <div class="form-group">
+                    <label>Durasi</label>
+                    <select id="durasi">
+                        <option>30 mnt</option>
+                        <option>45 mnt</option>
+                        <option selected>60 mnt</option>
+                        <option>90 mnt</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Nama</label>
+                <input type="text" id="nama" placeholder="Nama Anda" required>
+            </div>
+
+            <div class="form-group">
+                <label>WhatsApp</label>
+                <input type="tel" id="whatsapp" placeholder="0831-9558-5892" required>
+            </div>
+
+            <div class="form-group">
+                <label>Alamat Rumah</label>
+                <textarea id="alamat" placeholder="Alamat lengkap" required></textarea>
+            </div>
+
+            <div class="total-price">
+                <span>Total:</span>
+                <span id="total-price">Rp 0</span>
+            </div>
+
+            <button type="submit" class="btn-confirm">KONFIRMASI PEMESANAN</button>
+        </form>
+
+        <div class="sidebar-chat">
+            <div class="chat-header">
+                <div class="agent-info">
+                    <img src="https://ui-avatars.com/api/?name=Santi&background=c9a961&color=fff" alt="Agent">
+                    <div>
+                        <h4>Halo! Butuh bantuan? Ngobrol yuk!</h4>
+                        <p>Site Manager</p>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-message">
+                <p>Ketik pesan...</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Home Spa Family. All rights reserved.</p>
+            <p>Melayani dengan hati, untuk kenyamanan keluarga Anda ❤️</p>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/6283195585892" class="whatsapp-btn" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <script src="./script.js"></script>
+</body>
+</html>

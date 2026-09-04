@@ -1,0 +1,776 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #1d5f3f;
+    --secondary-color: #c9a961;
+    --light-bg: #f5f1e8;
+    --text-dark: #2c2c2c;
+    --text-light: #666;
+    --white: #ffffff;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-dark);
+    line-height: 1.6;
+    background: var(--white);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* =============== NAVBAR =============== */
+.navbar {
+    background: var(--white);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+    color: var(--primary-color);
+    font-size: 16px;
+}
+
+.logo i {
+    font-size: 24px;
+    color: var(--secondary-color);
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+}
+
+.nav-menu a {
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: color 0.3s;
+}
+
+.nav-menu a:hover {
+    color: var(--secondary-color);
+}
+
+.btn-pesan {
+    background: var(--secondary-color);
+    color: var(--white);
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.3s transform 0.3s;
+}
+
+.btn-pesan:hover {
+    background: #b8964f;
+    transform: translateY(-2px);
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.hamburger span {
+    width: 25px;
+    height: 3px;
+    background: var(--primary-color);
+    margin: 5px 0;
+    transition: 0.3s;
+}
+
+/* =============== MAIN WRAPPER & LAYOUT =============== */
+.main-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 0;
+    min-height: calc(100vh - 60px);
+}
+
+/* =============== HERO SECTION =============== */
+.hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 3rem;
+    padding: 3rem;
+    background: linear-gradient(135deg, #f5f1e8 0%, #fff 100%);
+}
+
+.hero-content h1 {
+    font-size: 2.8rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    line-height: 1.3;
+    font-weight: 700;
+}
+
+.hero-content > p {
+    font-size: 1.3rem;
+    color: var(--secondary-color);
+    margin-bottom: 2rem;
+    font-style: italic;
+}
+
+.btn-primary {
+    background: var(--secondary-color);
+    color: var(--white);
+    border: none;
+    padding: 0.9rem 2rem;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.3s transform 0.3s;
+}
+
+.btn-primary:hover {
+    background: #b8964f;
+    transform: translateY(-2px);
+}
+
+.hero-image img {
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    object-fit: cover;
+}
+
+/* =============== LAYANAN SECTION =============== */
+.layanan-section {
+    padding: 4rem 2rem;
+    background: var(--white);
+}
+
+.layanan-section h2 {
+    text-align: center;
+    font-size: 2.2rem;
+    color: var(--primary-color);
+    margin-bottom: 3rem;
+    font-weight: 700;
+}
+
+.layanan-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+}
+
+.layanan-card {
+    background: var(--light-bg);
+    padding: 2rem 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+    transition: transform 0.3s box-shadow 0.3s;
+    border: 1px solid #e8dcc8;
+}
+
+.layanan-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.layanan-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 1.8rem;
+    margin: 0 auto 1rem;
+}
+
+.layanan-card h3 {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+}
+
+.layanan-card p {
+    color: var(--text-light);
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.layanan-card .harga {
+    color: var(--secondary-color);
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+/* =============== PAKET SECTION =============== */
+.paket-section {
+    padding: 4rem 2rem;
+    background: var(--light-bg);
+}
+
+.paket-section h2 {
+    text-align: center;
+    font-size: 2.2rem;
+    color: var(--primary-color);
+    margin-bottom: 3rem;
+    font-weight: 700;
+}
+
+.paket-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem;
+}
+
+.paket-card {
+    background: var(--white);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.paket-card:hover {
+    transform: translateY(-8px);
+}
+
+.paket-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.paket-card h3 {
+    color: var(--primary-color);
+    padding: 1rem 1rem 0.3rem;
+    font-size: 1.1rem;
+}
+
+.paket-card p {
+    color: var(--text-light);
+    padding: 0 1rem;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.paket-card .harga {
+    color: var(--secondary-color);
+    font-weight: bold;
+    padding: 0 1rem 1rem;
+    font-size: 1.1rem;
+}
+
+/* =============== TENTANG SECTION =============== */
+.tentang-section {
+    padding: 4rem 2rem;
+    background: var(--white);
+}
+
+.tentang-section h2 {
+    text-align: center;
+    font-size: 2.2rem;
+    color: var(--primary-color);
+    margin-bottom: 3rem;
+    font-weight: 700;
+}
+
+.tentang-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+}
+
+.tentang-image img {
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.tentang-text h3 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.fitur-list {
+    list-style: none;
+}
+
+.fitur-list li {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
+
+.fitur-list i {
+    color: var(--secondary-color);
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+/* =============== BLOG SECTION =============== */
+.blog-section {
+    padding: 4rem 2rem;
+    background: var(--light-bg);
+}
+
+.blog-section h2 {
+    text-align: center;
+    font-size: 2.2rem;
+    color: var(--primary-color);
+    margin-bottom: 3rem;
+    font-weight: 700;
+}
+
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.blog-card {
+    background: var(--white);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.blog-card:hover {
+    transform: translateY(-8px);
+}
+
+.blog-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.blog-card h3 {
+    color: var(--primary-color);
+    padding: 1.5rem 1.5rem 0.5rem;
+    font-size: 1.1rem;
+}
+
+.blog-card p {
+    color: var(--text-light);
+    padding: 0 1.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.read-more {
+    display: inline-block;
+    padding: 0 1.5rem 1.5rem;
+    color: var(--secondary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+.read-more:hover {
+    color: #b8964f;
+}
+
+/* =============== KONTAK SECTION =============== */
+.kontak-section {
+    padding: 4rem 2rem;
+    background: var(--white);
+}
+
+.kontak-section h2 {
+    text-align: center;
+    font-size: 2.2rem;
+    color: var(--primary-color);
+    margin-bottom: 3rem;
+    font-weight: 700;
+}
+
+.kontak-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 3rem;
+}
+
+.info-item {
+    text-align: center;
+}
+
+.info-item i {
+    font-size: 2.5rem;
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+}
+
+.info-item h3 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.info-item p {
+    color: var(--text-light);
+}
+
+.info-item a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+.info-item a:hover {
+    color: #b8964f;
+}
+
+/* =============== SIDEBAR BOOKING =============== */
+.booking-sidebar {
+    position: sticky;
+    top: 60px;
+    right: 0;
+    width: 320px;
+    height: calc(100vh - 60px);
+    background: var(--white);
+    border-left: 1px solid #ddd;
+    padding: 1.5rem;
+    overflow-y: auto;
+    box-shadow: -2px 0 8px rgba(0,0,0,0.05);
+}
+
+.sidebar-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--secondary-color);
+}
+
+.sidebar-header h3 {
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.booking-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 0.4rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 3px rgba(201, 169, 97, 0.2);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.total-price {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem;
+    background: var(--light-bg);
+    border-radius: 6px;
+    font-weight: bold;
+    color: var(--primary-color);
+    font-size: 1rem;
+    margin: 0.5rem 0;
+}
+
+.btn-confirm {
+    width: 100%;
+    background: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: 0.8rem;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.3s transform 0.3s;
+}
+
+.btn-confirm:hover {
+    background: #154a2f;
+    transform: translateY(-2px);
+}
+
+.sidebar-chat {
+    background: var(--light-bg);
+    border-radius: 10px;
+    padding: 1rem;
+    border: 1px solid #e8dcc8;
+}
+
+.chat-header {
+    margin-bottom: 1rem;
+}
+
+.agent-info {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.agent-info img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.agent-info h4 {
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+}
+
+.agent-info p {
+    color: var(--text-light);
+    font-size: 0.75rem;
+}
+
+.chat-message {
+    background: var(--white);
+    padding: 0.8rem;
+    border-radius: 6px;
+    text-align: center;
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+/* =============== FOOTER =============== */
+.footer {
+    background: var(--primary-color);
+    color: var(--white);
+    padding: 2rem;
+    text-align: center;
+    border-top: 3px solid var(--secondary-color);
+}
+
+.footer p {
+    font-size: 0.9rem;
+    margin: 0.5rem 0;
+}
+
+/* =============== WHATSAPP BUTTON =============== */
+.whatsapp-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: #25d366;
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    transition: transform 0.3s background 0.3s;
+    z-index: 999;
+    text-decoration: none;
+}
+
+.whatsapp-btn:hover {
+    background: #20ba5a;
+    transform: scale(1.1);
+}
+
+/* =============== SCROLLBAR =============== */
+.booking-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.booking-sidebar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.booking-sidebar::-webkit-scrollbar-thumb {
+    background: var(--secondary-color);
+    border-radius: 3px;
+}
+
+.booking-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #b8964f;
+}
+
+/* =============== RESPONSIVE =============== */
+@media (max-width: 1024px) {
+    .main-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .booking-sidebar {
+        position: relative;
+        top: 0;
+        width: 100%;
+        height: auto;
+        border-left: none;
+        border-top: 1px solid #ddd;
+        margin-top: 2rem;
+        sticky: unset;
+    }
+
+    .hero {
+        grid-template-columns: 1fr;
+        padding: 2rem;
+        gap: 2rem;
+    }
+
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+
+    .tentang-content {
+        grid-template-columns: 1fr;
+    }
+
+    .nav-menu {
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-menu {
+        display: none;
+    }
+
+    .hamburger {
+        display: flex;
+    }
+
+    .main-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .layanan-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .paket-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .hero {
+        padding: 1.5rem;
+    }
+
+    .hero-content h1 {
+        font-size: 1.6rem;
+    }
+
+    .whatsapp-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+        bottom: 20px;
+        right: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .layanan-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nav-menu {
+        display: none;
+    }
+
+    .hero-content h1 {
+        font-size: 1.3rem;
+    }
+
+    .hero-content > p {
+        font-size: 1rem;
+    }
+
+    .layanan-section h2,
+    .paket-section h2,
+    .tentang-section h2,
+    .blog-section h2,
+    .kontak-section h2 {
+        font-size: 1.6rem;
+    }
+
+    .booking-sidebar {
+        padding: 1rem;
+    }
+
+    .sidebar-header h3 {
+        font-size: 1.1rem;
+    }
+}

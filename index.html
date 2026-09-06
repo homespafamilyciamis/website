@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Home Spa Family</title>
+<title>Home Spa Family - Relax, Refresh, Rejuvenate</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   :root{
@@ -90,7 +90,7 @@
   .hero{
     min-height:430px;
     display:grid;
-    grid-template-columns:minmax(0,1fr) 300px;
+    grid-template-columns:minmax(0,1fr) 340px;
     gap:18px;
     padding:18px 22px 0;
     background:
@@ -138,11 +138,11 @@
     box-shadow:0 6px 20px rgba(65,50,25,.20);
     border:1px solid #e6dbc1;
   }
-  .booking h2{text-align:center;font-size:22px;font-weight:500;margin-bottom:16px}
+  .booking h2{text-align:center;font-size:20px;font-weight:500;margin-bottom:14px}
   .field{margin-bottom:9px}
   .field label{
     display:block;font-family:Arial,sans-serif;font-size:11px;
-    margin-bottom:5px;color:#75664d
+    margin-bottom:4px;color:#75664d;font-weight:bold;
   }
   .field input,.field select,.field textarea{
     width:100%;
@@ -152,55 +152,130 @@
     background:white;
     outline:none;
     color:#5b513f;
+    font-size:12px;
   }
-  .field textarea{height:60px;resize:vertical}
+  .field select optgroup{
+    font-family:Arial,sans-serif;
+    font-weight:bold;
+    color:#806b3c;
+    background:#faf6ed;
+  }
+  .field select option{
+    color:#333;
+    background:#fff;
+    padding:4px;
+  }
+  .field textarea{height:54px;resize:vertical}
   .time-row{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-  .booking button{width:100%;border:0;font-size:12px;font-weight:bold;margin-top:4px}
+  .booking button{width:100%;border:0;font-size:12px;font-weight:bold;margin-top:6px}
 
-  .section{padding:24px 30px 28px}
-  .section-title{text-align:center;font-size:25px;font-weight:500;margin-bottom:22px}
+  .section{padding:30px 30px 36px}
+  .section-title{text-align:center;font-size:25px;font-weight:500;margin-bottom:8px}
+  .section-subtitle{text-align:center;font-family:Arial,sans-serif;font-size:12px;color:#7a6d56;margin-bottom:24px;letter-spacing:1px}
+
+  .subheading-bar{
+    text-align:center;
+    background:#2f4f2f;
+    color:#fff;
+    font-family:Arial,sans-serif;
+    font-size:12px;
+    letter-spacing:2px;
+    padding:6px 12px;
+    border-radius:20px;
+    max-width:260px;
+    margin:0 auto 20px;
+    font-weight:bold;
+  }
+
+  /* Grid Layanan Satuan */
   .services{
     display:grid;
     grid-template-columns:repeat(6,1fr);
-    gap:15px;
+    gap:12px;
     text-align:center;
+    margin-bottom:35px;
+  }
+  .service{
+    background:#fffcf5;
+    border:1px solid #ebdcb9;
+    border-radius:8px;
+    padding:14px 8px;
+    box-shadow:0 2px 8px rgba(60,45,20,.04);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
   }
   .service-icon{
-    width:55px;height:55px;border-radius:50%;
+    width:48px;height:48px;border-radius:50%;
     background:#eee2c5;
     border:1px solid #dfcfaa;
-    margin:0 auto 9px;
+    margin:0 auto 8px;
     display:grid;place-items:center;
-    font-size:24px;color:#a8894b;
+    font-size:20px;color:#a8894b;
   }
-  .service h3{font-size:14px;line-height:1.15;margin-bottom:4px}
+  .service h3{font-size:13px;line-height:1.2;margin-bottom:4px}
   .service p{font-family:Arial,sans-serif;font-size:11px;color:#716550;line-height:1.35}
-  .price{font-family:Arial,sans-serif;font-weight:bold;font-size:12px;margin-top:8px}
+  .price{font-family:Arial,sans-serif;font-weight:bold;font-size:12px;margin-top:6px;color:#856c35}
 
-  .packages{
+  /* Card Grid Paket & Panggilan */
+  .packages-grid{
     display:grid;
-    grid-template-columns:repeat(4,1fr);
+    grid-template-columns:repeat(3,1fr);
     gap:18px;
+    margin-bottom:35px;
   }
-  .card{
+  .package-card{
     background:#fffaf0;
     border:1px solid #e4d7b9;
+    border-radius:10px;
+    padding:18px;
+    box-shadow:0 4px 12px rgba(85,65,30,.06);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    text-align:center;
+  }
+  .package-card h3{font-size:17px;color:#806b3c;margin-bottom:6px}
+  .package-card p{font-family:Arial,sans-serif;font-size:12px;color:#776c59;margin-bottom:10px;line-height:1.5}
+  .package-card .duration{
+    font-family:Arial,sans-serif;
+    display:inline-block;
+    background:#f4ebd4;
+    color:#735c2e;
+    font-size:11px;
+    padding:3px 10px;
+    border-radius:12px;
+    margin-bottom:12px;
+  }
+  .package-card .card-price{
+    font-family:Arial,sans-serif;
+    background:#2f4f2f;
+    color:#fff;
+    padding:8px 12px;
+    border-radius:6px;
+    font-size:15px;
+    font-weight:bold;
+    letter-spacing:.5px;
+  }
+
+  /* Kenapa Home Spa Family */
+  .features-container{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-top:20px;
+  }
+  .feature-item{
+    background:#faf3e3;
+    border:1px solid #ded0b4;
     border-radius:8px;
-    overflow:hidden;
-    box-shadow:0 4px 12px rgba(85,65,30,.08);
+    padding:14px;
+    text-align:center;
+    font-family:Arial,sans-serif;
+    font-size:12px;
+    color:#61533d;
   }
-  .card-img{
-    height:130px;
-    background-size:cover;background-position:center;
-  }
-  .card:nth-child(1) .card-img{background-image:url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=700&q=80")}
-  .card:nth-child(2) .card-img{background-image:url("https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=700&q=80")}
-  .card:nth-child(3) .card-img{background-image:url("https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&w=700&q=80")}
-  .card:nth-child(4) .card-img{background-image:url("https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=700&q=80")}
-  .card-body{padding:12px 13px 15px}
-  .card h3{font-size:16px;margin-bottom:6px}
-  .card p{font-family:Arial,sans-serif;font-size:11px;color:#776c59;line-height:1.5}
-  .card .price{color:#856c35}
+  .feature-item strong{display:block;margin-top:6px;color:#806b3c;font-size:13px}
 
   .about{
     display:grid;grid-template-columns:1fr 1fr;gap:30px;
@@ -221,17 +296,15 @@
   }
   .footer h3{font-family:Georgia,serif;font-weight:500;margin-bottom:10px}
   .footer p,.footer a{font-size:12px;line-height:1.8;color:#d9d0bd}
-  .chat{
-    position:fixed;right:22px;bottom:20px;z-index:50;
-  }
+
+  .chat{position:fixed;right:22px;bottom:20px;z-index:50}
   .chat-btn{
     width:58px;height:58px;border-radius:50%;border:0;
     background:#b28f49;color:white;font-size:25px;cursor:pointer;
     box-shadow:0 5px 15px rgba(50,40,20,.25)
   }
   .chat-box{
-    display:none;
-    position:absolute;right:0;bottom:70px;width:260px;
+    display:none;position:absolute;right:0;bottom:70px;width:260px;
     background:#fffdf8;border:1px solid #ddd0b3;border-radius:10px;
     box-shadow:0 8px 25px rgba(50,40,20,.2);overflow:hidden;
   }
@@ -247,8 +320,10 @@
     .nav-links{gap:15px}
     .brand{margin-right:0}
     .hero{grid-template-columns:1fr}
-    .booking{max-width:420px;width:100%;margin:0 auto 20px}
-    .services{grid-template-columns:repeat(3,1fr);row-gap:24px}
+    .booking{max-width:480px;width:100%;margin:0 auto 20px}
+    .services{grid-template-columns:repeat(3,1fr);row-gap:15px}
+    .packages-grid{grid-template-columns:1fr}
+    .features-container{grid-template-columns:repeat(2,1fr)}
   }
   @media(max-width:650px){
     .navbar{height:auto;padding:12px;flex-wrap:wrap}
@@ -257,16 +332,12 @@
     .nav-links a.active:after{bottom:0}
     .nav-cta{padding:9px 14px!important}
     .hero{padding:0 10px}
-    .hero-content{min-height:340px;padding:20px}
-    h1{font-size:30px}
+    .hero-content{min-height:300px;padding:16px}
+    h1{font-size:26px}
     .services{grid-template-columns:repeat(2,1fr)}
-    .packages{grid-template-columns:1fr 1fr}
     .about{grid-template-columns:1fr;padding:25px}
     .footer{grid-template-columns:1fr;padding:30px}
-  }
-  @media(max-width:430px){
-    .packages{grid-template-columns:1fr}
-    .section{padding:22px 15px}
+    .features-container{grid-template-columns:1fr}
   }
 </style>
 </head>
@@ -279,9 +350,9 @@
   </a>
   <nav class="nav-links">
     <a class="active" href="#home">Home</a>
-    <a href="#layanan">Layanan Kami</a>
-    <a href="#paket">Paket Keluarga</a>
-    <a href="#blog">Blog</a>
+    <a href="#layanan">Daftar Layanan</a>
+    <a href="#paket-spa">Paket Spa</a>
+    <a href="#panggilan">Daftar Panggilan</a>
     <a href="#tentang">Tentang Kami</a>
     <a href="#kontak">Kontak</a>
     <a class="nav-cta" href="#booking">PESAN SEKARANG</a>
@@ -292,10 +363,10 @@
   <section class="hero" id="home">
     <div class="hero-content">
       <div class="hero-copy">
-        <div class="eyebrow">HOME SPA FAMILY</div>
+        <div class="eyebrow">RELAX • REFRESH • REJUVENATE</div>
         <h1>KENYAMANAN SPA<br>TERBAIK DI RUMAH ANDA</h1>
-        <p>Nikmati perawatan spa profesional tanpa perlu keluar rumah. Hadir untuk seluruh keluarga dengan layanan yang nyaman, aman, dan praktis.</p>
-        <a class="gold-btn" href="#layanan">LIHAT LAYANAN KAMI</a>
+        <p>Nikmati perawatan spa profesional tanpa perlu keluar rumah. Melayani dengan hati untuk kenyamanan keluarga Anda dengan layanan yang privat, higienis, dan fleksibel.</p>
+        <a class="gold-btn" href="#layanan">LIHAT SEMUA MENU</a>
       </div>
     </div>
 
@@ -303,63 +374,170 @@
       <h2>BOOKING ONLINE</h2>
       <form onsubmit="submitBooking(event)">
         <div class="field">
-          <label>Pilih Layanan</label>
+          <label for="service">Pilih Layanan / Paket</label>
           <select id="service" required>
-            <option value="">Pilih layanan...</option>
-            <option>Pijat Keluarga — Rp350rb / 60mnt</option>
-            <option>Spa Anak — Rp200rb / 45mnt</option>
-            <option>Pijat Ibu Hamil — Rp400rb / 75mnt</option>
-            <option>Perawatan Wajah & Tubuh — Rp250rb / 50mnt</option>
-            <option>Paket Pasangan — Rp650rb / 90mnt</option>
-            <option>Manicure & Pedicure — Rp180rb</option>
+            <option value="" disabled selected>-- Silakan Pilih Layanan --</option>
+            
+            <optgroup label="DAFTAR LAYANAN">
+              <option value="Body Massage (Rp 120.000)">Body Massage — Rp 120.000</option>
+              <option value="Pijat Ibu Hamil (Rp 200.000/jam)">Pijat Ibu Hamil — Rp 200.000 / jam</option>
+              <option value="Facial (Rp 100.000)">Facial — Rp 100.000</option>
+              <option value="Face Massage + Masker (Rp 100.000)">Face Massage + Masker — Rp 100.000</option>
+              <option value="Facial + Masker (Rp 150.000)">Facial + Masker — Rp 150.000</option>
+              <option value="Creambath (Rp 100.000)">Creambath — Rp 100.000</option>
+              <option value="Masker Rambut (Rp 85.000)">Masker Rambut — Rp 85.000</option>
+              <option value="Scrub (Rp 100.000)">Scrub — Rp 100.000</option>
+              <option value="Kerokan (Rp 30.000)">Kerokan — Rp 30.000</option>
+              <option value="Cuci Catok (Rp 30.000)">Cuci Catok — Rp 30.000</option>
+              <option value="Gurah Mata (Rp 150.000)">Gurah Mata — Rp 150.000</option>
+              <option value="Bekam (Rp 300.000)">Bekam — Rp 300.000</option>
+            </optgroup>
+
+            <optgroup label="PAKET SPA">
+              <option value="Paket Manja: Scrub + Facial + Masker (Rp 230.000)">Paket Manja (1.5 Jam) — Rp 230.000</option>
+              <option value="Paket Rilex: Body Massage + Facemask (Rp 210.000)">Paket Rilex (1.5 Jam) — Rp 210.000</option>
+              <option value="Paket Komplit: Massage + Facial + Masker + Scrub (Rp 350.000)">Paket Komplit (2.5 Jam) — Rp 350.000</option>
+            </optgroup>
+
+            <optgroup label="DAFTAR PANGGILAN">
+              <option value="Panggilan: Body Massage 70 Menit (Rp 175.000)">Body Massage (70 Menit) — Rp 175.000</option>
+              <option value="Panggilan: Paket Sedang 90 Menit (Rp 275.000)">Paket Sedang (Massage + Facemask) — Rp 275.000</option>
+              <option value="Panggilan: Paket Rilexs 150 Menit (Rp 375.000)">Paket Rilexs (Massage + Facemask/Facial + Scrub) — Rp 375.000</option>
+            </optgroup>
           </select>
         </div>
-        <div class="field">
-          <label>Tanggal (Kalender)</label>
-          <input id="date" type="date" required>
-        </div>
+
         <div class="time-row">
           <div class="field">
-            <label>Waktu (Jam)</label>
-            <input id="time" type="time" required>
+            <label for="date">Tanggal</label>
+            <input id="date" type="date" required>
           </div>
           <div class="field">
-            <label>Durasi</label>
-            <select>
-              <option>60 menit</option>
-              <option>45 menit</option>
-              <option>75 menit</option>
-              <option>90 menit</option>
-            </select>
+            <label for="time">Jam Booking</label>
+            <input id="time" type="time" required>
           </div>
         </div>
-        <div class="field"><label>Nama</label><input id="name" placeholder="Nama lengkap" required></div>
-        <div class="field"><label>WhatsApp</label><input id="wa" placeholder="08xxxxxxxxxx" required></div>
-        <div class="field"><label>Alamat Rumah</label><textarea id="address" placeholder="Alamat lengkap" required></textarea></div>
-        <button class="gold-btn" type="submit">KONFIRMASI PEMESANAN</button>
+
+        <div class="field">
+          <label for="name">Nama Lengkap</label>
+          <input id="name" placeholder="Nama pemesan" required>
+        </div>
+        <div class="field">
+          <label for="wa">No. WhatsApp</label>
+          <input id="wa" type="tel" placeholder="08xxxxxxxxxx" required>
+        </div>
+        <div class="field">
+          <label for="address">Alamat Lengkap</label>
+          <textarea id="address" placeholder="Alamat rumah / patokan lokasi..." required></textarea>
+        </div>
+        <div class="field">
+          <label for="note">Catatan Tambahan (Opsional)</label>
+          <input id="note" placeholder="Misal: ada keluhan pegal di pundak">
+        </div>
+
+        <button class="gold-btn" type="submit">KONFIRMASI VIA WHATSAPP</button>
       </form>
     </aside>
   </section>
 
   <section class="section" id="layanan">
-    <h2 class="section-title">LAYANAN KAMI</h2>
+    <div class="subheading-bar">DAFTAR LAYANAN</div>
     <div class="services">
-      <div class="service"><div class="service-icon">♨</div><h3>Pijat Keluarga</h3><p>Relaxing Family Massage</p><div class="price">Rp 350rb/60mnt</div></div>
-      <div class="service"><div class="service-icon">◉</div><h3>Spa Anak</h3><p>Kids Pamper</p><div class="price">Rp 200rb/45mnt</div></div>
-      <div class="service"><div class="service-icon">♧</div><h3>Pijat Ibu Hamil</h3><p>Pregnancy Massage</p><div class="price">Rp 400rb/75mnt</div></div>
-      <div class="service"><div class="service-icon">♕</div><h3>Perawatan Wajah &amp; Tubuh</h3><p>Facial &amp; Body Scrub</p><div class="price">Rp 250rb/50mnt</div></div>
-      <div class="service"><div class="service-icon">♡</div><h3>Paket Pasangan</h3><p>Couples Retreat</p><div class="price">Rp 650rb/90mnt</div></div>
-      <div class="service"><div class="service-icon">✿</div><h3>Manicure &amp; Pedicure</h3><p>Relaxing Care</p><div class="price">Rp 180rb</div></div>
+      <div class="service"><div class="service-icon">💆</div><h3>Body massage</h3><p>Relaksasi tubuh menyeluruh</p><div class="price">Rp 120.000</div></div>
+      <div class="service"><div class="service-icon">🤰</div><h3>Pijat ibu hamil</h3><p>Perawatan lembut & aman</p><div class="price">Rp 200.000 / jam</div></div>
+      <div class="service"><div class="service-icon">✨</div><h3>Facial</h3><p>Pembersihan pori & wajah</p><div class="price">Rp 100.000</div></div>
+      <div class="service"><div class="service-icon">🌸</div><h3>Face massage + masker</h3><p>Pijat wajah & nutrisi kulit</p><div class="price">Rp 100.000</div></div>
+      <div class="service"><div class="service-icon">🌺</div><h3>Facial + masker</h3><p>Kombinasi facial komplit</p><div class="price">Rp 150.000</div></div>
+      <div class="service"><div class="service-icon">💆‍♀️</div><h3>Creambath</h3><p>Perawatan akar & rambut</p><div class="price">Rp 100.000</div></div>
+      <div class="service"><div class="service-icon">🌿</div><h3>Masker rambut</h3><p>Nutrisi mendalam helai rambut</p><div class="price">Rp 85.000</div></div>
+      <div class="service"><div class="service-icon">🍃</div><h3>Scrub</h3><p>Angkat sel kulit mati</p><div class="price">Rp 100.000</div></div>
+      <div class="service"><div class="service-icon">🪙</div><h3>Kerokan</h3><p>Meredakan masuk angin</p><div class="price">Rp 30.000</div></div>
+      <div class="service"><div class="service-icon">💇</div><h3>Cuci catok</h3><p>Styling rambut rapi</p><div class="price">Rp 30.000</div></div>
+      <div class="service"><div class="service-icon">👁️</div><h3>Gurah mata</h3><p>Pembersihan & kesegaran mata</p><div class="price">Rp 150.000</div></div>
+      <div class="service"><div class="service-icon">🩹</div><h3>Bekam</h3><p>Terapi kesehatan tubuh</p><div class="price">Rp 300.000</div></div>
     </div>
   </section>
 
-  <section class="section" id="paket">
-    <h2 class="section-title">PAKET POPULER</h2>
-    <div class="packages">
-      <article class="card"><div class="card-img"></div><div class="card-body"><h3>Paket Ceria Keluarga</h3><p>Pijat relaksasi untuk seluruh keluarga dengan suasana nyaman di rumah.</p><div class="price">Mulai Rp 900rb</div></div></article>
-      <article class="card"><div class="card-img"></div><div class="card-body"><h3>Paket Ceria Keluarga</h3><p>Kombinasi massage dan body treatment untuk waktu istirahat terbaik.</p><div class="price">Rp 950rb / 3 orang</div></div></article>
-      <article class="card"><div class="card-img"></div><div class="card-body"><h3>Paket Body Pangan</h3><p>Perawatan tubuh lengkap dengan pilihan treatment favorit.</p><div class="price">Rp 650rb</div></div></article>
-      <article class="card"><div class="card-img"></div><div class="card-body"><h3>Manicure &amp; Pedicure</h3><p>Perawatan tangan dan kaki dengan layanan profesional di rumah.</p><div class="price">Rp 180rb</div></div></article>
+  <section class="section" id="paket-spa" style="background:#f4ebd4;">
+    <div class="subheading-bar">PAKET SPA</div>
+    <div class="packages-grid">
+      <article class="package-card">
+        <div>
+          <h3>PAKET MANJA</h3>
+          <p>Scrub + facial + masker</p>
+          <span class="duration">⏱ Durasi 1,5 jam</span>
+        </div>
+        <div class="card-price">Rp 230.000</div>
+      </article>
+      <article class="package-card">
+        <div>
+          <h3>PAKET RILEX</h3>
+          <p>Body massage + facemask</p>
+          <span class="duration">⏱ Durasi 1,5 jam</span>
+        </div>
+        <div class="card-price">Rp 210.000</div>
+      </article>
+      <article class="package-card">
+        <div>
+          <h3>PAKET KOMPLIT</h3>
+          <p>Body massage + facial + masker + scrub</p>
+          <span class="duration">⏱ Durasi 2,5 jam</span>
+        </div>
+        <div class="card-price">Rp 350.000</div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="panggilan">
+    <div class="subheading-bar">DAFTAR PANGGILAN</div>
+    <div class="packages-grid">
+      <article class="package-card">
+        <div>
+          <h3>BODY MASSAGE</h3>
+          <p>1 jam treatment</p>
+          <span class="duration">⏱ Durasi 70 menit</span>
+        </div>
+        <div class="card-price">Rp 175.000</div>
+      </article>
+      <article class="package-card">
+        <div>
+          <h3>PAKET SEDANG</h3>
+          <p>Body massage 1 jam + Facemask 30 menit</p>
+          <span class="duration">⏱ Total 90 menit</span>
+        </div>
+        <div class="card-price">Rp 275.000</div>
+      </article>
+      <article class="package-card">
+        <div>
+          <h3>PAKET RILEXS</h3>
+          <p>Body massage 1 jam + Facemask / facial + Scrub</p>
+          <span class="duration">⏱ Durasi 150 menit</span>
+        </div>
+        <div class="card-price">Rp 375.000</div>
+      </article>
+    </div>
+
+    <div class="features-container">
+      <div class="feature-item">
+        <span>👩‍⚕️</span>
+        <strong>Terapis Berpengalaman</strong>
+        Tenaga ahli terlatih dan profesional
+      </div>
+      <div class="feature-item">
+        <span>🧴</span>
+        <strong>Produk Berkualitas</strong>
+        Aman, nyaman, dan ramah untuk kulit
+      </div>
+      <div class="feature-item">
+        <span>🛡️</span>
+        <strong>Higiens & Aman</strong>
+        Standar sanitasi dan peralatan terjamin
+      </div>
+      <div class="feature-item">
+        <span>🏡</span>
+        <strong>Home Service Fleksibel</strong>
+        Nyaman dan privat di rumah Anda
+      </div>
     </div>
   </section>
 
@@ -367,15 +545,34 @@
     <div class="about-image"></div>
     <div class="about-copy">
       <h2>Relaksasi Nyaman, Di Rumah Anda</h2>
-      <p>Home Spa Family menghadirkan pengalaman spa yang hangat dan personal untuk keluarga. Anda cukup memilih layanan, menentukan waktu, lalu terapis kami datang ke rumah.</p>
+      <p>Home Spa Family menghadirkan pengalaman spa yang hangat, privat, dan personal untuk keluarga. Cukup pilih layanan melalui sistem booking kami, tentukan waktu kunjungan, dan terapis kami akan tiba tepat waktu.</p>
       <a class="gold-btn" href="#booking">BOOKING SEKARANG</a>
     </div>
   </section>
 
   <footer class="footer" id="kontak">
-    <div><h3>HOME SPA FAMILY</h3><p>Perawatan spa keluarga profesional dengan kenyamanan langsung di rumah Anda.</p></div>
-    <div><h3>Kontak</h3><p>WhatsApp: 08xxxxxxxxxx<br>Email: help@homespa-family.com<br>Jam layanan: 08.00–21.00</p></div>
-    <div><h3>Menu</h3><p><a href="#layanan">Layanan Kami</a><br><a href="#paket">Paket Keluarga</a><br><a href="#booking">Booking Online</a></p></div>
+    <div>
+      <h3>HOME SPA FAMILY</h3>
+      <p>Perawatan spa keluarga profesional dengan kenyamanan langsung di rumah Anda.</p>
+      <p style="margin-top:10px;font-style:italic;">Relax • Refresh • Rejuvenate</p>
+    </div>
+    <div>
+      <h3>Kontak Reservasi</h3>
+      <p>
+        WhatsApp: <strong>0831-9558-5892</strong><br>
+        Email: help@homespa-family.com<br>
+        Jam Layanan: 08.00 – 21.00 WIB
+      </p>
+    </div>
+    <div>
+      <h3>Navigasi</h3>
+      <p>
+        <a href="#layanan">Daftar Layanan</a><br>
+        <a href="#paket-spa">Paket Spa</a><br>
+        <a href="#panggilan">Daftar Panggilan</a><br>
+        <a href="#booking">Form Booking</a>
+      </p>
+    </div>
   </footer>
 </main>
 
@@ -383,33 +580,79 @@
   <div class="chat-box" id="chatBox">
     <div class="chat-head">Santi — Customer Service</div>
     <div class="chat-body">
-      Halo! Butuh bantuan? Ngobrol yuk!
-      <div class="chat-input"><input id="chatInput" placeholder="Ketik pesan..."><button onclick="sendChat()">➤</button></div>
+      Halo! Butuh bantuan atau info layanan spa? Ngobrol yuk!
+      <div class="chat-input">
+        <input id="chatInput" placeholder="Ketik pesan...">
+        <button onclick="sendChat()">➤</button>
+      </div>
     </div>
   </div>
   <button class="chat-btn" onclick="toggleChat()" aria-label="Chat">💬</button>
 </div>
 
 <script>
+  // Kunci batas tanggal minimal ke hari ini
+  document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('date');
+    if (dateInput) {
+      dateInput.setAttribute('min', today);
+    }
+  });
+
   function toggleChat(){
     document.getElementById('chatBox').classList.toggle('open');
   }
 
   function sendChat(){
-    const input=document.getElementById('chatInput');
+    const input = document.getElementById('chatInput');
     if(input.value.trim()){
-      alert('Pesan diterima: '+input.value.trim());
-      input.value='';
+      const query = encodeURIComponent(input.value.trim());
+      window.open(`https://wa.me/6283195585892?text=${query}`, '_blank');
+      input.value = '';
     }
   }
 
   function submitBooking(e){
     e.preventDefault();
-    const name=document.getElementById('name').value;
-    const service=document.getElementById('service').value;
-    const date=document.getElementById('date').value;
-    const time=document.getElementById('time').value;
-    alert(`Terima kasih, ${name}!\\n\\nBooking: ${service}\\nTanggal: ${date}\\nJam: ${time}\\n\\nSilakan hubungkan form ini ke backend/WhatsApp untuk pemesanan nyata.`);
+
+    const service = document.getElementById('service').value;
+    const date = document.getElementById('date').value;
+    const time = document.getElementById('time').value;
+    const name = document.getElementById('name').value;
+    const wa = document.getElementById('wa').value;
+    const address = document.getElementById('address').value;
+    const note = document.getElementById('note') ? document.getElementById('note').value : '-';
+
+    if (!service || !date || !time || !name || !wa || !address) {
+      alert('Mohon lengkapi semua kolom yang wajib diisi!');
+      return;
+    }
+
+    // Format tanggal ke Bahasa Indonesia
+    const dateObj = new Date(date + 'T00:00:00');
+    const formattedDate = dateObj.toLocaleDateString('id-ID', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    const textMessage = 
+      `*BOOKING LAYANAN HOME SPA FAMILY*%0A` +
+      `----------------------------------------%0A` +
+      `*Nama:* ${encodeURIComponent(name)}%0A` +
+      `*No. WhatsApp:* ${encodeURIComponent(wa)}%0A` +
+      `*Layanan:* ${encodeURIComponent(service)}%0A` +
+      `*Jadwal:* ${encodeURIComponent(formattedDate)}%0A` +
+      `*Jam Booking:* ${encodeURIComponent(time)} WIB%0A` +
+      `*Alamat:* ${encodeURIComponent(address)}%0A` +
+      `*Catatan:* ${encodeURIComponent(note || '-')}%0A` +
+      `----------------------------------------%0A` +
+      `Mohon konfirmasi ketersediaan jadwal dan terapis. Terima kasih!`;
+
+    const waUrl = `https://wa.me/6283195585892?text=${textMessage}`;
+    window.open(waUrl, '_blank');
   }
 </script>
 </body>

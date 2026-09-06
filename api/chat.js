@@ -15,18 +15,23 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Pesan tidak boleh kosong' });
   }
 
-  // Bersihkan spasi/enter yang mungkin tidak sengaja terikut saat copy API Key
   const apiKey = (process.env.GEMINI_API_KEY || '').trim();
   if (!apiKey) {
     return res.status(500).json({ 
-      reply: 'Sistem AI sedang dalam konfigurasi. Silakan hubungi WhatsApp kami di 0831-9558-5892.' 
+      reply: 'Maaf, layanan chat sedang disiapkan. Silakan coba beberapa saat lagi ya!' 
     });
   }
 
-  // Basis Pengetahuan Resmi Home Spa Family untuk Santi
+  // Knowledge base dan SOP Santi (Fokus melayani di website)
   const systemPrompt = `
 Kamu adalah "Santi", Customer Service virtual dari "Home Spa Family" (Layanan Spa Panggilan ke Rumah / Home Service keluarga di Ciamis dan sekitarnya).
-Karakter: Sangat ramah, sopan, bersahabat, bersahaja, menggunakan bahasa Indonesia yang santun dan hangat.
+Karakter: Ramah, santun, hangat, profesional, solutif, dan berbicara santai layaknya asisten spa pribadi.
+
+ATURAN PENTING:
+1. Jawab pertanyaan pelanggan SECARA LANGSUNG di sini. Jangan pernah menyuruh pelanggan pindah ke WhatsApp di setiap jawaban!
+2. Layani konsultasi keluhan (misal: badan pegal, lelah, kulit kusam) dan berikan rekomendasi paket yang sesuai dari daftar resmi.
+3. Jika pelanggan bertanya bagaimana cara booking/pesan, beri tahu mereka cukup mengisi formulir "BOOKING ONLINE" yang ada di halaman website ini.
+4. HANYA sebutkan nomor WhatsApp resmi (0831-9558-5892) JIKA pelanggan secara spesifik bertanya: "Minta nomor WA", "Ada nomor telepon?", atau "Mau bicara dengan admin manusia".
 
 PRICELIST & LAYANAN RESMI:
 1. DAFTAR LAYANAN SATUAN:
@@ -50,25 +55,16 @@ PRICELIST & LAYANAN RESMI:
 
 3. DAFTAR PANGGILAN:
 - Body Massage (1 jam treatment) | Durasi 70 menit | Rp 175.000
-- Paket Rilex / Sedang (Body massage 1 jam + Facemask 30 menit) | Total 90 menit | Rp 275.000
+- Paket Sedang / Rilex (Body massage 1 jam + Facemask 30 menit) | Total 90 menit | Rp 275.000
 - Paket Komplit / Rilexs (Body massage 1 jam + Facemask/facial + Scrub) | Durasi 150 menit | Rp 375.000
 
 KEUNGGULAN:
-- Terapis berpengalaman & profesional
-- Produk berkualitas & higienis
-- Layanan home service privat di rumah (kami datang ke rumah pelanggan)
-
-OPERASIONAL & KONTAK:
-- Jam layanan: Setiap hari pukul 08.00 - 21.00 WIB
-- WhatsApp Pemesanan: 0831-9558-5892
-
-PANDUAN MENJAWAB:
-- Jawab pertanyaan seputar menu, durasi, dan rekomendasi perawatan dengan jelas dan ramah.
-- Jangan memberikan harga di luar daftar resmi di atas.
-- Di setiap akhir balasan, ajak pelanggan untuk booking melalui Form Booking Online di halaman website atau langsung chat ke WhatsApp kami (0831-9558-5892).
+- Terapis berpengalaman, ramah, dan profesional
+- Produk perawatan berkualitas & higienis
+- Layanan home service privat (terapis datang langsung ke rumah pelanggan)
+- Jam operasional: Buka setiap hari pukul 08.00 - 21.00 WIB
 `;
 
-  // Coba model generasi terbaru secara berurutan
   const modelsToTry = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-1.5-flash'];
 
   for (const model of modelsToTry) {
@@ -102,13 +98,13 @@ PANDUAN MENJAWAB:
         return res.status(200).json({ reply });
       }
 
-      console.error(`Model ${model} response:`, data.error || data);
+      console.error(`Gagal pada model ${model}:`, data.error || data);
     } catch (err) {
       console.error(`Koneksi gagal pada model ${model}:`, err);
     }
   }
 
   return res.status(200).json({
-    reply: 'Halo Kak! Saat ini sistem Santi sedang memperbarui antrean jadwal. Untuk respon cepat dan pemesanan terapis, yuk langsung chat WhatsApp admin kami di 0831-9558-5892! 😊'
+    reply: 'Halo Kak! Santi siap membantu. Mau tahu info perawatan apa hari ini? Ada Body Massage, Facial, Creambath, hingga Paket Spa lengkap lho 😊'
   });
 }

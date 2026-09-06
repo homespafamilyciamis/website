@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   const apiKey = (process.env.GEMINI_API_KEY || '').trim();
   if (!apiKey) {
     return res.status(200).json({ 
-      reply: 'Kunci API belum terbaca di Vercel. Pastikan GEMINI_API_KEY sudah disave di menu Environment Variables Vercel.' 
+      reply: 'Kunci API belum terbaca di Vercel. Pastikan GEMINI_API_KEY sudah disimpan di Environment Variables.' 
     });
   }
 
@@ -31,7 +31,7 @@ ATURAN UTAMA:
 1. Jawab pertanyaan pelanggan SECARA LANGSUNG, NYAMBUNG, dan SPESIFIK sesuai apa yang ditanyakan!
 2. Jika ditanya "apakah bisa untuk laki-laki / pria?": Jawab BISA. Home Spa Family adalah spa keluarga yang melayani pria, wanita, anak-anak, ibu hamil, maupun reservasi untuk pasangan/keluarga di rumah.
 3. Berikan informasi treatment, durasi, dan harga sesuai daftar resmi di bawah ini.
-4. Jika pelanggan ingin memesan / booking, arahkan untuk mengisi formulir "BOOKING ONLINE" yang ada di atas halaman website ini.
+4. Jika pelanggan ingin memesan / booking, arahkan untuk mengisi formulir "BOOKING ONLINE" yang ada di bagian atas halaman website ini.
 5. JANGAN menyuruh pelanggan pindah ke WhatsApp di setiap jawaban, kecuali jika pelanggan secara khusus meminta nomor telepon/kontak admin.
 
 PRICELIST & LAYANAN RESMI:
@@ -61,16 +61,15 @@ PRICELIST & LAYANAN RESMI:
 
 OPERASIONAL:
 - Jam layanan: Setiap hari pukul 08.00 - 21.00 WIB
-- WhatsApp Admin: 0831-9558-5892 (hanya sebutkan jika ditanya nomor kontak)
+- WhatsApp Admin: 0831-9558-5892 (hanya sebutkan jika pelanggan menanyakan nomor kontak)
 `;
 
-  // Model Gemini aktif
-  const models = ['gemini-1.5-flash', 'gemini-2.5-flash'];
+  // Daftar model terbaru Google
+  const models = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.1-flash-lite'];
   let lastError = '';
 
   for (const model of models) {
     try {
-      // Kirim kunci API HANYA lewat parameter URL (?key=) untuk menghindari konflik kredensial ganda
       const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
 
       const response = await fetch(endpoint, {
@@ -103,8 +102,7 @@ OPERASIONAL:
     }
   }
 
-  // Jika Google memberikan penolakan tertentu, tampilkan penyebab aslinya agar langsung terdeteksi
   return res.status(200).json({
-    reply: `Maaf Kak, sistem AI mengalami kendala teknis: ${lastError}`
+    reply: `Maaf Kak, terjadi kendala: ${lastError}`
   });
 }

@@ -3,20 +3,30 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { message } = req.body;
+  let message = req.body?.message;
+  if (!message && typeof req.body === 'string') {
+    try {
+      const parsed = JSON.parse(req.body);
+      message = parsed.message;
+    } catch (e) {}
+  }
+
   if (!message) {
     return res.status(400).json({ error: 'Pesan tidak boleh kosong' });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  // Bersihkan spasi/enter yang mungkin tidak sengaja terikut saat copy API Key
+  const apiKey = (process.env.GEMINI_API_KEY || '').trim();
   if (!apiKey) {
-    return res.status(500).json({ reply: 'Sistem AI sedang dalam konfigurasi. Silakan hubungi WhatsApp kami di 0831-9558-5892.' });
+    return res.status(500).json({ 
+      reply: 'Sistem AI sedang dalam konfigurasi. Silakan hubungi WhatsApp kami di 0831-9558-5892.' 
+    });
   }
 
-  // Knowledge base spa untuk Santi
+  // Basis Pengetahuan Resmi Home Spa Family untuk Santi
   const systemPrompt = `
-Kamu adalah "Santi", Customer Service virtual dari "Home Spa Family" (Layanan Spa Panggilan ke Rumah / Home Service di Ciamis dan sekitarnya).
-Karakter: Sangat ramah, sopan, bersahabat, menggunakan bahasa Indonesia yang santun dan hangat.
+Kamu adalah "Santi", Customer Service virtual dari "Home Spa Family" (Layanan Spa Panggilan ke Rumah / Home Service keluarga di Ciamis dan sekitarnya).
+Karakter: Sangat ramah, sopan, bersahabat, bersahaja, menggunakan bahasa Indonesia yang santun dan hangat.
 
 PRICELIST & LAYANAN RESMI:
 1. DAFTAR LAYANAN SATUAN:
@@ -40,53 +50,65 @@ PRICELIST & LAYANAN RESMI:
 
 3. DAFTAR PANGGILAN:
 - Body Massage (1 jam treatment) | Durasi 70 menit | Rp 175.000
-- Paket Sedang (Body massage 1 jam + Facemask 30 menit) | Total 90 menit | Rp 275.000
-- Paket Rilexs (Body massage 1 jam + Facemask/facial + Scrub) | Durasi 150 menit | Rp 375.000
+- Paket Rilex / Sedang (Body massage 1 jam + Facemask 30 menit) | Total 90 menit | Rp 275.000
+- Paket Komplit / Rilexs (Body massage 1 jam + Facemask/facial + Scrub) | Durasi 150 menit | Rp 375.000
 
 KEUNGGULAN:
-- Terapis berpengalaman & bersertifikat
-- Produk berkualitas, aman untuk kulit
-- Higienis, peralatan bersih
-- Home service fleksibel: terapis datang langsung ke rumah pelanggan.
+- Terapis berpengalaman & profesional
+- Produk berkualitas & higienis
+- Layanan home service privat di rumah (kami datang ke rumah pelanggan)
 
 OPERASIONAL & KONTAK:
-- Jam layanan: Setiap hari pukul 08.00 - 21.00 WIB.
-- WhatsApp Resmi: 0831-9558-5892.
+- Jam layanan: Setiap hari pukul 08.00 - 21.00 WIB
+- WhatsApp Pemesanan: 0831-9558-5892
 
-ATURAN MENJAWAB:
-- Jawab pertanyaan seputar harga, paket, dan perawatan secara ringkas, jelas, dan ramah.
-- Jangan mengarang layanan di luar daftar di atas.
-- Di akhir jawaban, ajak pelanggan melakukan booking melalui "Form Booking Online" di bagian atas halaman atau langsung klik link WhatsApp admin (0831-9558-5892).
+PANDUAN MENJAWAB:
+- Jawab pertanyaan seputar menu, durasi, dan rekomendasi perawatan dengan jelas dan ramah.
+- Jangan memberikan harga di luar daftar resmi di atas.
+- Di setiap akhir balasan, ajak pelanggan untuk booking melalui Form Booking Online di halaman website atau langsung chat ke WhatsApp kami (0831-9558-5892).
 `;
 
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: {
-            parts: [{ text: systemPrompt }]
+  // Coba model generasi terbaru secara berurutan
+  const modelsToTry = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-1.5-flash'];
+
+  for (const model of modelsToTry) {
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': apiKey
           },
-          contents: [
-            {
-              role: 'user',
-              parts: [{ text: message }]
-            }
-          ]
-        })
+          body: JSON.stringify({
+            systemInstruction: {
+              parts: [{ text: systemPrompt }]
+            },
+            contents: [
+              {
+                role: 'user',
+                parts: [{ text: message }]
+              }
+            ]
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+        const reply = data.candidates[0].content.parts[0].text;
+        return res.status(200).json({ reply });
       }
-    );
 
-    const data = await response.json();
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 
-      'Maaf, Santi sedang kesulitan memproses pesan. Silakan hubungi WhatsApp kami di 0831-9558-5892 ya!';
-
-    return res.status(200).json({ reply });
-  } catch (err) {
-    return res.status(500).json({ 
-      reply: 'Layanan chat sedang sibuk. Silakan langsung hubungi WhatsApp kami di 0831-9558-5892.' 
-    });
+      console.error(`Model ${model} response:`, data.error || data);
+    } catch (err) {
+      console.error(`Koneksi gagal pada model ${model}:`, err);
+    }
   }
+
+  return res.status(200).json({
+    reply: 'Halo Kak! Saat ini sistem Santi sedang memperbarui antrean jadwal. Untuk respon cepat dan pemesanan terapis, yuk langsung chat WhatsApp admin kami di 0831-9558-5892! 😊'
+  });
 }

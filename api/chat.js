@@ -17,21 +17,22 @@ export default async function handler(req, res) {
 
   const apiKey = (process.env.GEMINI_API_KEY || '').trim();
   if (!apiKey) {
-    return res.status(500).json({ 
-      reply: 'Maaf, layanan chat sedang disiapkan. Silakan coba beberapa saat lagi ya!' 
+    return res.status(200).json({ 
+      reply: 'Kunci API belum terbaca di Vercel. Pastikan GEMINI_API_KEY sudah disave di menu Environment Variables Vercel.' 
     });
   }
 
-  // Knowledge base dan SOP Santi (Fokus melayani di website)
+  // Pengetahuan & Karakter Santi
   const systemPrompt = `
-Kamu adalah "Santi", Customer Service virtual dari "Home Spa Family" (Layanan Spa Panggilan ke Rumah / Home Service keluarga di Ciamis dan sekitarnya).
-Karakter: Ramah, santun, hangat, profesional, solutif, dan berbicara santai layaknya asisten spa pribadi.
+Kamu adalah "Santi", Customer Service virtual resmi dari "Home Spa Family" (Layanan Spa Panggilan ke Rumah / Home Service di Ciamis dan sekitarnya).
+Karakter: Ramah, santun, hangat, profesional, dan solutif layaknya asisten spa pribadi keluarga.
 
-ATURAN PENTING:
-1. Jawab pertanyaan pelanggan SECARA LANGSUNG di sini. Jangan pernah menyuruh pelanggan pindah ke WhatsApp di setiap jawaban!
-2. Layani konsultasi keluhan (misal: badan pegal, lelah, kulit kusam) dan berikan rekomendasi paket yang sesuai dari daftar resmi.
-3. Jika pelanggan bertanya bagaimana cara booking/pesan, beri tahu mereka cukup mengisi formulir "BOOKING ONLINE" yang ada di halaman website ini.
-4. HANYA sebutkan nomor WhatsApp resmi (0831-9558-5892) JIKA pelanggan secara spesifik bertanya: "Minta nomor WA", "Ada nomor telepon?", atau "Mau bicara dengan admin manusia".
+ATURAN UTAMA:
+1. Jawab pertanyaan pelanggan SECARA LANGSUNG, NYAMBUNG, dan SPESIFIK sesuai apa yang ditanyakan!
+2. Jika ditanya "apakah bisa untuk laki-laki / pria?": Jawab BISA. Home Spa Family adalah spa keluarga yang melayani pria, wanita, anak-anak, ibu hamil, maupun reservasi untuk pasangan/keluarga di rumah.
+3. Berikan informasi treatment, durasi, dan harga sesuai daftar resmi di bawah ini.
+4. Jika pelanggan ingin memesan / booking, arahkan untuk mengisi formulir "BOOKING ONLINE" yang ada di atas halaman website ini.
+5. JANGAN menyuruh pelanggan pindah ke WhatsApp di setiap jawaban, kecuali jika pelanggan secara khusus meminta nomor telepon/kontak admin.
 
 PRICELIST & LAYANAN RESMI:
 1. DAFTAR LAYANAN SATUAN:
@@ -55,56 +56,55 @@ PRICELIST & LAYANAN RESMI:
 
 3. DAFTAR PANGGILAN:
 - Body Massage (1 jam treatment) | Durasi 70 menit | Rp 175.000
-- Paket Sedang / Rilex (Body massage 1 jam + Facemask 30 menit) | Total 90 menit | Rp 275.000
+- Paket Rilex / Sedang (Body massage 1 jam + Facemask 30 menit) | Total 90 menit | Rp 275.000
 - Paket Komplit / Rilexs (Body massage 1 jam + Facemask/facial + Scrub) | Durasi 150 menit | Rp 375.000
 
-KEUNGGULAN:
-- Terapis berpengalaman, ramah, dan profesional
-- Produk perawatan berkualitas & higienis
-- Layanan home service privat (terapis datang langsung ke rumah pelanggan)
-- Jam operasional: Buka setiap hari pukul 08.00 - 21.00 WIB
+OPERASIONAL:
+- Jam layanan: Setiap hari pukul 08.00 - 21.00 WIB
+- WhatsApp Admin: 0831-9558-5892 (hanya sebutkan jika ditanya nomor kontak)
 `;
 
-  const modelsToTry = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-1.5-flash'];
+  // Model Gemini aktif
+  const models = ['gemini-1.5-flash', 'gemini-2.5-flash'];
+  let lastError = '';
 
-  for (const model of modelsToTry) {
+  for (const model of models) {
     try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-goog-api-key': apiKey
+      // Kirim kunci API HANYA lewat parameter URL (?key=) untuk menghindari konflik kredensial ganda
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          systemInstruction: {
+            parts: [{ text: systemPrompt }]
           },
-          body: JSON.stringify({
-            systemInstruction: {
-              parts: [{ text: systemPrompt }]
-            },
-            contents: [
-              {
-                role: 'user',
-                parts: [{ text: message }]
-              }
-            ]
-          })
-        }
-      );
+          contents: [
+            {
+              role: 'user',
+              parts: [{ text: message }]
+            }
+          ]
+        })
+      });
 
       const data = await response.json();
 
       if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-        const reply = data.candidates[0].content.parts[0].text;
-        return res.status(200).json({ reply });
+        return res.status(200).json({ reply: data.candidates[0].content.parts[0].text });
       }
 
-      console.error(`Gagal pada model ${model}:`, data.error || data);
+      lastError = data.error?.message || JSON.stringify(data);
     } catch (err) {
-      console.error(`Koneksi gagal pada model ${model}:`, err);
+      lastError = err.message;
     }
   }
 
+  // Jika Google memberikan penolakan tertentu, tampilkan penyebab aslinya agar langsung terdeteksi
   return res.status(200).json({
-    reply: 'Halo Kak! Santi siap membantu. Mau tahu info perawatan apa hari ini? Ada Body Massage, Facial, Creambath, hingga Paket Spa lengkap lho 😊'
+    reply: `Maaf Kak, sistem AI mengalami kendala teknis: ${lastError}`
   });
 }

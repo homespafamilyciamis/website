@@ -1,239 +1,643 @@
-// Set minimum date to today
-document.addEventListener('DOMContentLoaded', function() {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('tanggal').setAttribute('min', today);
+// ============================================================
+// HOME SPA FAMILY — PUBLIC SCRIPT
+// ============================================================
+
+document.addEventListener('DOMContentLoaded', function () {
+    initDateInput();
+    updatePrice();
+    setupResponsiveMenu();
+    setupMobileMenu();
+    setupSmoothScroll();
+    setupNavActiveState();
+    setupScrollEffect();
+    setupAnimations();
 });
 
-// Update total price when service is selected
+// ============================================================
+// SET MINIMUM DATE
+// Menggunakan tanggal lokal agar aman untuk WIB
+// ============================================================
+
+function getLocalDateString() {
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}
+
+function initDateInput() {
+    const dateInput = document.getElementById('tanggal');
+
+    if (!dateInput) return;
+
+    dateInput.setAttribute('min', getLocalDateString());
+}
+
+// ============================================================
+// UPDATE TOTAL PRICE
+// ============================================================
+
 function updatePrice() {
     const serviceSelect = document.getElementById('service');
-    const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
-    
-    if (selectedOption.value) {
-        const [serviceName, price] = selectedOption.value.split('|');
-        const priceInRupiah = parseInt(price) * 1000;
-        document.getElementById('total-price').textContent = 'Rp ' + priceInRupiah.toLocaleString('id-ID');
+    const totalPrice = document.getElementById('total-price');
+
+    if (!serviceSelect || !totalPrice) return;
+
+    const selectedOption =
+        serviceSelect.options[serviceSelect.selectedIndex];
+
+    if (selectedOption && selectedOption.value) {
+        const parts = selectedOption.value.split('|');
+
+        const price = parts[1] || '0';
+        const priceInRupiah = parseInt(price, 10) * 1000;
+
+        if (!isNaN(priceInRupiah)) {
+            totalPrice.textContent =
+                'Rp ' + priceInRupiah.toLocaleString('id-ID');
+        } else {
+            totalPrice.textContent = 'Rp 0';
+        }
     } else {
-        document.getElementById('total-price').textContent = 'Rp 0';
+        totalPrice.textContent = 'Rp 0';
     }
 }
 
-// Format currency
+// ============================================================
+// FORMAT CURRENCY
+// ============================================================
+
 function formatCurrency(value) {
-    return 'Rp ' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    const number = Number(value) || 0;
+
+    return 'Rp ' + number.toLocaleString('id-ID');
 }
 
-// Submit booking form
+// ============================================================
+// FORMAT DATE INDONESIA
+// ============================================================
+
+function formatDate(dateString) {
+    if (!dateString) return '-';
+
+    const date = new Date(dateString + 'T00:00:00');
+
+    if (isNaN(date.getTime())) {
+        return dateString;
+    }
+
+    return date.toLocaleDateString('id-ID', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+}
+
+// ============================================================
+// VALIDASI NOMOR WHATSAPP
+// ============================================================
+
+function validateWhatsAppNumber(value) {
+    if (!value) return false;
+
+    const cleaned = value.replace(/[^0-9+]/g, '');
+    const digits = cleaned.replace(/^\+/, '');
+
+    return digits.length >= 9;
+}
+
+// ============================================================
+// MEMBUAT PESAN WHATSAPP
+// ============================================================
+
+function createWhatsAppMessage(bookingData) {
+    return encodeURIComponent(
+        `Halo Home Spa Family, saya ingin melakukan booking:\n\n` +
+        `📋 Layanan: ${bookingData.service}\n` +
+        `📅 Tanggal: ${formatDate(bookingData.tanggal)}\n` +
+        `🕐 Jam: ${bookingData.jam}\n` +
+        `⏱️ Durasi: ${bookingData.durasi}\n` +
+        `👤 Nama: ${bookingData.nama}\n` +
+        `📱 WhatsApp: ${bookingData.whatsapp}\n` +
+        `🏠 Alamat: ${bookingData.alamat}\n` +
+        `💰 Total: ${formatCurrency(bookingData.price)}\n\n` +
+        `Terima kasih!`
+    );
+}
+
+// ============================================================
+// OPEN WHATSAPP
+// ============================================================
+
+function openWhatsApp(message) {
+    const phoneNumber = '6283195585892';
+
+    const url =
+        `https://wa.me/${phoneNumber}?text=${message}`;
+
+    window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+// ============================================================
+// SUBMIT BOOKING FORM
+// ============================================================
+
 async function submitBooking(event) {
     event.preventDefault();
-    
+
+    const form = document.getElementById('booking-form');
     const serviceSelect = document.getElementById('service');
-    const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
-    
-    if (!selectedOption.value) {
-        alert('Mohon pilih layanan terlebih dahulu!');
+    const submitButton =
+        form?.querySelector('button[type="submit"]');
+
+    if (!serviceSelect) {
+        alert('Form booking tidak ditemukan.');
         return;
     }
-    
-    const [serviceName, price] = selectedOption.value.split('|');
-    
+
+    const selectedOption =
+        serviceSelect.options[serviceSelect.selectedIndex];
+
+    // --------------------------------------------------------
+    // Validasi layanan
+    // --------------------------------------------------------
+
+    if (!selectedOption || !selectedOption.value) {
+        alert('Mohon pilih layanan terlebih dahulu!');
+        serviceSelect.focus();
+        return;
+    }
+
+    const parts = selectedOption.value.split('|');
+
+    const serviceName = parts[0] || '';
+    const price = parseInt(parts[1], 10) || 0;
+
+    // --------------------------------------------------------
+    // Ambil data form
+    // --------------------------------------------------------
+
     const bookingData = {
-        service: serviceName,
-        price: parseInt(price) * 1000,
-        tanggal: document.getElementById('tanggal').value,
-        jam: document.getElementById('jam').value,
-        durasi: document.getElementById('durasi').value,
-        nama: document.getElementById('nama').value,
-        whatsapp: document.getElementById('whatsapp').value,
-        alamat: document.getElementById('alamat').value
+        service: serviceName.trim(),
+        price: price * 1000,
+        tanggal: document.getElementById('tanggal')?.value || '',
+        jam: document.getElementById('jam')?.value || '',
+        durasi: document.getElementById('durasi')?.value || '',
+        nama: document.getElementById('nama')?.value.trim() || '',
+        whatsapp:
+            document.getElementById('whatsapp')?.value.trim() || '',
+        alamat:
+            document.getElementById('alamat')?.value.trim() || ''
     };
-    
-    // Validasi
-    if (!bookingData.tanggal || !bookingData.jam || !bookingData.nama || !bookingData.whatsapp || !bookingData.alamat) {
+
+    // --------------------------------------------------------
+    // Validasi field wajib
+    // --------------------------------------------------------
+
+    if (
+        !bookingData.tanggal ||
+        !bookingData.jam ||
+        !bookingData.nama ||
+        !bookingData.whatsapp ||
+        !bookingData.alamat
+    ) {
         alert('Mohon lengkapi semua field yang wajib diisi!');
         return;
     }
-    
+
+    // --------------------------------------------------------
+    // Validasi tanggal
+    // --------------------------------------------------------
+
+    const today = getLocalDateString();
+
+    if (bookingData.tanggal < today) {
+        alert('Tanggal booking tidak boleh sebelum hari ini.');
+        document.getElementById('tanggal')?.focus();
+        return;
+    }
+
+    // --------------------------------------------------------
+    // Validasi WhatsApp
+    // --------------------------------------------------------
+
+    if (!validateWhatsAppNumber(bookingData.whatsapp)) {
+        alert('Mohon masukkan nomor WhatsApp yang valid.');
+        document.getElementById('whatsapp')?.focus();
+        return;
+    }
+
+    // --------------------------------------------------------
+    // Loading state
+    // --------------------------------------------------------
+
+    let originalButtonText = '';
+
+    if (submitButton) {
+        originalButtonText = submitButton.textContent;
+
+        submitButton.disabled = true;
+        submitButton.textContent = 'MEMPROSES BOOKING...';
+
+        submitButton.style.opacity = '0.7';
+        submitButton.style.cursor = 'wait';
+    }
+
     try {
-        // Send to backend
+        // ----------------------------------------------------
+        // Kirim data ke backend
+        // ----------------------------------------------------
+
         const response = await fetch('/api/booking', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(bookingData)
         });
-        
+
+        let result = null;
+
+        try {
+            result = await response.json();
+        } catch (_) {
+            result = null;
+        }
+
+        // ----------------------------------------------------
+        // Booking backend berhasil
+        // ----------------------------------------------------
+
         if (response.ok) {
-            const result = await response.json();
-            
-            // Show success message
-            alert('✅ Booking berhasil! Silakan lanjutkan ke WhatsApp untuk konfirmasi.');
-            
-            // Prepare WhatsApp message
-            const message = encodeURIComponent(
-                `Halo Home Spa Family, saya ingin melakukan booking:\n\n` +
-                `📋 Layanan: ${bookingData.service}\n` +
-                `📅 Tanggal: ${formatDate(bookingData.tanggal)}\n` +
-                `🕐 Jam: ${bookingData.jam}\n` +
-                `⏱️ Durasi: ${bookingData.durasi}\n` +
-                `👤 Nama: ${bookingData.nama}\n` +
-                `📱 WhatsApp: ${bookingData.whatsapp}\n` +
-                `🏠 Alamat: ${bookingData.alamat}\n` +
-                `💰 Total: ${formatCurrency(bookingData.price)}\n\n` +
-                `Terima kasih!`
+            const whatsappMessage =
+                createWhatsAppMessage(bookingData);
+
+            alert(
+                '✅ Booking berhasil dikirim!\n\n' +
+                'Silakan lanjutkan ke WhatsApp untuk konfirmasi jadwal.'
             );
-            
-            // Open WhatsApp
-            window.open(`https://wa.me/6283195585892?text=${message}`, '_blank');
-            
-            // Reset form
-            document.getElementById('booking-form').reset();
-            document.getElementById('total-price').textContent = 'Rp 0';
-        } else {
-            alert('❌ Ada kesalahan saat melakukan booking. Silakan coba lagi.');
+
+            openWhatsApp(whatsappMessage);
+
+            if (form) {
+                form.reset();
+            }
+
+            const totalPrice =
+                document.getElementById('total-price');
+
+            if (totalPrice) {
+                totalPrice.textContent = 'Rp 0';
+            }
+
+            return;
         }
-    } catch (error) {
-        console.error('Error:', error);
-        // Even if backend error, still proceed with WhatsApp
-        const message = encodeURIComponent(
-            `Halo Home Spa Family, saya ingin melakukan booking:\n\n` +
-            `📋 Layanan: ${bookingData.service}\n` +
-            `📅 Tanggal: ${formatDate(bookingData.tanggal)}\n` +
-            `🕐 Jam: ${bookingData.jam}\n` +
-            `⏱️ Durasi: ${bookingData.durasi}\n` +
-            `👤 Nama: ${bookingData.nama}\n` +
-            `📱 WhatsApp: ${bookingData.whatsapp}\n` +
-            `🏠 Alamat: ${bookingData.alamat}\n` +
-            `💰 Total: ${formatCurrency(bookingData.price)}`
+
+        // ----------------------------------------------------
+        // Backend memberikan error
+        // ----------------------------------------------------
+
+        console.error(
+            'Booking API error:',
+            result || response.status
         );
-        
-        window.open(`https://wa.me/6283195585892?text=${message}`, '_blank');
-        document.getElementById('booking-form').reset();
-        document.getElementById('total-price').textContent = 'Rp 0';
+
+        /*
+         * Jangan langsung menganggap booking gagal total.
+         * Data tetap bisa dikirim ke WhatsApp agar pelanggan
+         * tidak kehilangan data booking.
+         */
+
+        const whatsappMessage =
+            createWhatsAppMessage(bookingData);
+
+        alert(
+            '⚠️ Sistem booking sedang mengalami kendala.\n\n' +
+            'Data booking akan tetap diarahkan ke WhatsApp untuk konfirmasi.'
+        );
+
+        openWhatsApp(whatsappMessage);
+
+    } catch (error) {
+
+        // ----------------------------------------------------
+        // Network error
+        // ----------------------------------------------------
+
+        console.error('Booking error:', error);
+
+        /*
+         * Jika internet/API bermasalah, tetap bantu pelanggan
+         * melanjutkan booking melalui WhatsApp.
+         */
+
+        const whatsappMessage =
+            createWhatsAppMessage(bookingData);
+
+        alert(
+            '⚠️ Koneksi ke sistem booking sedang bermasalah.\n\n' +
+            'Silakan lanjutkan booking melalui WhatsApp.'
+        );
+
+        openWhatsApp(whatsappMessage);
+
+    } finally {
+
+        // ----------------------------------------------------
+        // Kembalikan tombol
+        // ----------------------------------------------------
+
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent =
+                originalButtonText || 'KONFIRMASI VIA WHATSAPP';
+
+            submitButton.style.opacity = '';
+            submitButton.style.cursor = '';
+        }
     }
 }
 
-// Format date to Indonesian format
-function formatDate(dateString) {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString + 'T00:00:00').toLocaleDateString('id-ID', options);
-}
+// ============================================================
+// MOBILE MENU
+// ============================================================
 
-// Mobile menu toggle
-document.querySelector('.hamburger').addEventListener('click', function() {
-    const navMenu = document.querySelector('.nav-menu');
-    navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
-});
+function setupMobileMenu() {
+    const hamburger =
+        document.querySelector('.hamburger');
 
-// Smooth scroll for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({behavior: 'smooth'});
-        }
-    });
-});
+    const navMenu =
+        document.querySelector('.nav-menu');
 
-// Close mobile menu when clicking on a link
-document.querySelectorAll('.nav-menu a').forEach(link => {
-    link.addEventListener('click', function() {
-        const navMenu = document.querySelector('.nav-menu');
-        navMenu.style.display = 'none';
-    });
-});
+    if (!hamburger || !navMenu) return;
 
-// Make sidebar sticky on scroll
-let lastScrollTop = 0;
-const sidebar = document.querySelector('.booking-sidebar');
+    hamburger.addEventListener('click', function () {
 
-window.addEventListener('scroll', function() {
-    let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    
-    if (sidebar) {
-        if (scrollTop > lastScrollTop) {
-            // Scroll down
-            sidebar.style.boxShadow = '-2px 0 12px rgba(0,0,0,0.1)';
+        const isOpen =
+            navMenu.classList.contains('menu-open');
+
+        if (isOpen) {
+            navMenu.classList.remove('menu-open');
+            navMenu.style.display = 'none';
         } else {
-            // Scroll up
-            sidebar.style.boxShadow = '-2px 0 8px rgba(0,0,0,0.05)';
-        }
-    }
-    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-});
-
-// Add active class to navigation menu based on scroll position
-window.addEventListener('scroll', function() {
-    let current = '';
-    
-    const sections = document.querySelectorAll('section');
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        if (pageYOffset >= sectionTop - 200) {
-            current = section.getAttribute('id');
+            navMenu.classList.add('menu-open');
+            navMenu.style.display = 'flex';
         }
     });
-    
-    document.querySelectorAll('.nav-menu a').forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href').slice(1) === current) {
-            link.classList.add('active');
-        }
-    });
-});
 
-// Responsive hamburger menu
+    // Tutup menu ketika klik link
+    navMenu.querySelectorAll('a').forEach(function (link) {
+
+        link.addEventListener('click', function () {
+
+            if (window.innerWidth <= 768) {
+                navMenu.classList.remove('menu-open');
+                navMenu.style.display = 'none';
+            }
+        });
+    });
+}
+
+// ============================================================
+// RESPONSIVE MENU
+// ============================================================
+
 function setupResponsiveMenu() {
-    const hamburger = document.querySelector('.hamburger');
-    const navMenu = document.querySelector('.nav-menu');
-    
+    const hamburger =
+        document.querySelector('.hamburger');
+
+    const navMenu =
+        document.querySelector('.nav-menu');
+
+    if (!hamburger || !navMenu) return;
+
     if (window.innerWidth <= 768) {
-        navMenu.style.display = 'none';
+
+        // Jangan membuka menu otomatis
+        if (!navMenu.classList.contains('menu-open')) {
+            navMenu.style.display = 'none';
+        }
+
     } else {
+
+        navMenu.classList.remove('menu-open');
         navMenu.style.display = 'flex';
     }
 }
 
-window.addEventListener('resize', setupResponsiveMenu);
-window.addEventListener('load', setupResponsiveMenu);
+window.addEventListener(
+    'resize',
+    setupResponsiveMenu
+);
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Set today as minimum date
-    const today = new Date().toISOString().split('T')[0];
-    const dateInput = document.getElementById('tanggal');
-    if (dateInput) {
-        dateInput.setAttribute('min', today);
+// ============================================================
+// SMOOTH SCROLL
+// ============================================================
+
+function setupSmoothScroll() {
+
+    document
+        .querySelectorAll('a[href^="#"]')
+        .forEach(function (anchor) {
+
+            anchor.addEventListener('click', function (event) {
+
+                const href =
+                    this.getAttribute('href');
+
+                if (!href || href === '#') {
+                    return;
+                }
+
+                const target =
+                    document.querySelector(href);
+
+                if (!target) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            });
+        });
+}
+
+// ============================================================
+// ACTIVE NAVIGATION
+// ============================================================
+
+function setupNavActiveState() {
+
+    const navLinks =
+        document.querySelectorAll('.nav-menu a');
+
+    if (!navLinks.length) return;
+
+    const sections =
+        document.querySelectorAll('section[id]');
+
+    function updateActiveNavigation() {
+
+        let current = '';
+
+        const scrollPosition =
+            window.scrollY + 180;
+
+        sections.forEach(function (section) {
+
+            const sectionTop =
+                section.offsetTop;
+
+            const sectionHeight =
+                section.offsetHeight;
+
+            if (
+                scrollPosition >= sectionTop &&
+                scrollPosition < sectionTop + sectionHeight
+            ) {
+                current =
+                    section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(function (link) {
+
+            link.classList.remove('active');
+
+            const href =
+                link.getAttribute('href');
+
+            if (
+                href &&
+                href.startsWith('#') &&
+                href.substring(1) === current
+            ) {
+                link.classList.add('active');
+            }
+        });
     }
-    
-    // Initialize price display
-    updatePrice();
-    
-    // Setup responsive menu
-    setupResponsiveMenu();
-});
 
-// Intersection Observer for fade-in animation
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -100px 0px'
-};
+    window.addEventListener(
+        'scroll',
+        updateActiveNavigation,
+        { passive: true }
+    );
 
-const observer = new IntersectionObserver(function(entries) {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-            observer.unobserve(entry.target);
-        }
+    updateActiveNavigation();
+}
+
+// ============================================================
+// SIDEBAR SCROLL EFFECT
+// ============================================================
+
+function setupScrollEffect() {
+
+    const sidebar =
+        document.querySelector('.booking-sidebar');
+
+    if (!sidebar) return;
+
+    let lastScrollTop = 0;
+
+    window.addEventListener(
+        'scroll',
+        function () {
+
+            const scrollTop =
+                window.pageYOffset ||
+                document.documentElement.scrollTop;
+
+            if (scrollTop > lastScrollTop) {
+
+                sidebar.style.boxShadow =
+                    '-2px 0 12px rgba(0,0,0,0.10)';
+
+            } else {
+
+                sidebar.style.boxShadow =
+                    '-2px 0 8px rgba(0,0,0,0.05)';
+            }
+
+            lastScrollTop =
+                scrollTop <= 0 ? 0 : scrollTop;
+        },
+        { passive: true }
+    );
+}
+
+// ============================================================
+// ANIMATION
+// ============================================================
+
+function setupAnimations() {
+
+    if (!('IntersectionObserver' in window)) {
+        return;
+    }
+
+    const elements =
+        document.querySelectorAll(
+            '.layanan-card, .paket-card, .blog-card, .service, .package-card, .feature-item'
+        );
+
+    if (!elements.length) {
+        return;
+    }
+
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -80px 0px'
+    };
+
+    const observer =
+        new IntersectionObserver(
+            function (entries) {
+
+                entries.forEach(function (entry) {
+
+                    if (entry.isIntersecting) {
+
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform =
+                            'translateY(0)';
+
+                        observer.unobserve(
+                            entry.target
+                        );
+                    }
+                });
+
+            },
+            observerOptions
+        );
+
+    elements.forEach(function (element) {
+
+        element.style.opacity = '0';
+
+        element.style.transform =
+            'translateY(20px)';
+
+        element.style.transition =
+            'opacity 0.5s ease, transform 0.5s ease';
+
+        observer.observe(element);
     });
-}, observerOptions);
+}
 
-document.querySelectorAll('.layanan-card, .paket-card, .blog-card').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(20px)';
-    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-    observer.observe(el);
-});
+// ============================================================
+// GLOBAL FUNCTION
+// Supaya HTML onchange="updatePrice()" tetap bekerja.
+// ============================================================
+
+window.updatePrice = updatePrice;
+window.submitBooking = submitBooking;
+window.formatCurrency = formatCurrency;
+window.formatDate = formatDate;

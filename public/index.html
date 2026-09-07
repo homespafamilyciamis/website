@@ -3,7 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Home Spa Family - Relax, Refresh, Rejuvenate</title>
+<title>Home Spa Family Ciamis | Spa, Massage & Home Service</title>
+<meta name="description" content="Home Spa Family melayani spa, massage, facial, creambath dan perawatan lainnya di salon serta home service di Ciamis. Booking 08.00–21.00 WIB.">
+<meta name="keywords" content="home spa Ciamis, spa Ciamis, massage Ciamis, pijat panggilan Ciamis, spa panggilan Ciamis, facial Ciamis, home service spa">
+<meta name="robots" content="index,follow">
+<meta property="og:title" content="Home Spa Family Ciamis | Spa & Home Service">
+<meta property="og:description" content="Perawatan spa dan home service yang nyaman, privat, higienis, dan fleksibel.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.homespafamily.my.id/">
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   :root{
@@ -384,7 +391,289 @@
     .footer{grid-template-columns:1fr;padding:30px}
     .features-container{grid-template-columns:1fr}
   }
+
+  /* ===== CONVERSION & UX UPGRADE ===== */
+  html{scroll-behavior:smooth}
+  section[id]{scroll-margin-top:92px}
+  .hero{
+    position:relative;
+    isolation:isolate;
+  }
+  .hero:after{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:-1;
+    background:linear-gradient(90deg,rgba(247,240,223,.78) 0%,rgba(247,240,223,.38) 48%,rgba(247,240,223,.08) 100%);
+    pointer-events:none;
+  }
+  .hero-content{position:relative;z-index:1}
+  .hero-copy{
+    background:rgba(255,250,237,.72);
+    border:1px solid rgba(255,255,255,.45);
+    border-radius:14px;
+    backdrop-filter:blur(3px);
+    box-shadow:0 8px 25px rgba(60,45,20,.08);
+  }
+  .hero-proof{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:0 0 18px;
+    font-family:Arial,sans-serif;
+    font-size:11px;
+  }
+  .hero-proof span{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    background:rgba(255,255,255,.82);
+    border:1px solid #e3d6b9;
+    padding:6px 9px;
+    border-radius:20px;
+    color:#66583f;
+  }
+  .hero-actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+  .wa-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    background:#2f4f2f;
+    color:#fff!important;
+    border-radius:22px;
+    padding:12px 18px;
+    font-family:Arial,sans-serif;
+    font-size:12px;
+    font-weight:bold;
+    box-shadow:0 4px 12px rgba(47,79,47,.18);
+  }
+  .mini-note{
+    font-family:Arial,sans-serif;
+    font-size:11px;
+    color:#6d624f;
+    margin-top:9px;
+  }
+  .booking-trust{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:6px;
+    margin:10px 0 2px;
+    font-family:Arial,sans-serif;
+    font-size:10px;
+    color:#6c604c;
+  }
+  .booking-trust div{
+    background:#f8f2e5;
+    border-radius:5px;
+    padding:7px 6px;
+    text-align:center;
+  }
+  .service,.package-card,.feature-item{
+    transition:transform .18s ease,box-shadow .18s ease;
+  }
+  .service:hover,.package-card:hover,.feature-item:hover{
+    transform:translateY(-3px);
+    box-shadow:0 8px 20px rgba(85,65,30,.10);
+  }
+  .service-actions{
+    display:flex;
+    gap:5px;
+    justify-content:center;
+    margin-top:9px;
+  }
+  .small-book{
+    border:1px solid #cdbb91;
+    background:#fff;
+    color:#735c2e;
+    border-radius:16px;
+    padding:6px 9px;
+    font-family:Arial,sans-serif;
+    font-size:10px;
+    font-weight:bold;
+    cursor:pointer;
+  }
+  .popular{
+    position:relative;
+    border-color:#b5944c;
+    box-shadow:0 5px 18px rgba(181,148,76,.16);
+  }
+  .popular:before{
+    content:"PALING FAVORIT";
+    position:absolute;
+    top:-10px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#2f4f2f;
+    color:#fff;
+    padding:4px 10px;
+    border-radius:12px;
+    font:700 9px Arial,sans-serif;
+    letter-spacing:1px;
+    white-space:nowrap;
+  }
+  .package-actions{margin-top:10px}
+  .package-book{
+    display:inline-block;
+    width:100%;
+    background:#b5944c;
+    color:#fff!important;
+    border-radius:18px;
+    padding:8px 12px;
+    font:700 11px Arial,sans-serif;
+  }
+
+  .steps-section{background:#fffaf0}
+  .steps{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+    max-width:900px;
+    margin:0 auto;
+  }
+  .step{
+    text-align:center;
+    padding:18px 14px;
+    background:#fffcf5;
+    border:1px solid #e5d8bb;
+    border-radius:10px;
+  }
+  .step-number{
+    width:34px;height:34px;border-radius:50%;
+    margin:0 auto 9px;
+    display:grid;place-items:center;
+    background:#2f4f2f;color:#fff;
+    font:bold 13px Arial,sans-serif;
+  }
+  .step strong{
+    display:block;
+    font-size:15px;
+    margin-bottom:5px;
+  }
+  .step p{
+    font:12px/1.5 Arial,sans-serif;
+    color:#716550;
+  }
+
+  .faq-list{max-width:900px;margin:0 auto}
+  .faq-list details{
+    background:#fffcf5;
+    border:1px solid #e4d7b9;
+    border-radius:8px;
+    margin-bottom:8px;
+    padding:0 15px;
+  }
+  .faq-list summary{
+    cursor:pointer;
+    list-style:none;
+    padding:14px 2px;
+    font-size:14px;
+    font-weight:bold;
+  }
+  .faq-list summary::-webkit-details-marker{display:none}
+  .faq-list summary:after{
+    content:"+";
+    float:right;
+    color:#b5944c;
+    font-size:18px;
+  }
+  .faq-list details[open] summary:after{content:"−"}
+  .faq-list details p{
+    padding:0 2px 14px;
+    font:12px/1.6 Arial,sans-serif;
+    color:#6c604c;
+  }
+
+  .final-cta{
+    padding:34px 30px;
+    text-align:center;
+    background:linear-gradient(135deg,#eee4cf,#f7f0df);
+  }
+  .final-cta h2{font-size:27px;font-weight:500;margin-bottom:8px}
+  .final-cta p{
+    font:13px/1.6 Arial,sans-serif;
+    color:#6b5e48;
+    margin:0 auto 15px;
+    max-width:620px;
+  }
+  .final-cta-actions{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+
+  .chat-label{
+    position:absolute;
+    right:70px;
+    bottom:7px;
+    white-space:nowrap;
+    background:#fffdf7;
+    border:1px solid #ded0b4;
+    border-radius:18px;
+    padding:7px 11px;
+    box-shadow:0 4px 12px rgba(50,40,20,.12);
+    font:700 10px Arial,sans-serif;
+    color:#66583f;
+  }
+  .chat-btn{position:relative}
+
+  .mobile-bottom-cta{
+    display:none;
+  }
+
+  @media(max-width:650px){
+    .hero-copy{padding:15px}
+    .hero-actions{display:grid;grid-template-columns:1fr;gap:7px}
+    .hero-actions .gold-btn,.hero-actions .wa-btn{width:100%;text-align:center}
+    .hero-proof span{font-size:10px}
+    .steps{grid-template-columns:1fr}
+    .final-cta{padding:30px 20px}
+    .chat-label{display:none}
+    .mobile-bottom-cta{
+      display:flex;
+      position:fixed;
+      left:10px;right:10px;bottom:10px;
+      z-index:90;
+      gap:7px;
+      padding:7px;
+      background:rgba(255,253,247,.96);
+      border:1px solid #ddcfb2;
+      border-radius:13px;
+      box-shadow:0 7px 24px rgba(50,40,20,.18);
+      backdrop-filter:blur(5px);
+    }
+    .mobile-bottom-cta a{
+      flex:1;
+      text-align:center;
+      padding:10px 7px;
+      border-radius:9px;
+      font:700 11px Arial,sans-serif;
+    }
+    .mobile-bottom-cta a:first-child{background:#2f4f2f;color:#fff}
+    .mobile-bottom-cta a:last-child{background:#b5944c;color:#fff}
+    body{padding-bottom:65px}
+  }
+
 </style>
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"BeautySalon",
+  "name":"Home Spa Family",
+  "url":"https://www.homespafamily.my.id/",
+  "telephone":"+6283195585892",
+  "address":{
+    "@type":"PostalAddress",
+    "streetAddress":"Jl. Otista, Perum Bumi Ciharalang Lestari, Ciharalang, Cijeungjing",
+    "addressLocality":"Ciamis",
+    "addressCountry":"ID"
+  },
+  "openingHours":"Mo-Su 08:00-21:00",
+  "areaServed":"Ciamis"
+}
+</script>
+
 </head>
 <body>
 
@@ -409,9 +698,18 @@
     <div class="hero-content">
       <div class="hero-copy">
         <div class="eyebrow">RELAX • REFRESH • REJUVENATE</div>
-        <h1>KENYAMANAN SPA<br>TERBAIK DI RUMAH ANDA</h1>
-        <p>Nikmati perawatan spa profesional tanpa perlu keluar rumah. Melayani dengan hati untuk kenyamanan keluarga Anda dengan layanan yang privat, higienis, dan fleksibel.</p>
-        <a class="gold-btn" href="#layanan">LIHAT SEMUA MENU</a>
+        <div class="hero-proof">
+          <span>🏡 Home Service</span>
+          <span>🕐 08.00–21.00 WIB</span>
+          <span>✨ Privat & Nyaman</span>
+        </div>
+        <h1>SPA & PERAWATAN<br>NYAMAN DI RUMAH ANDA</h1>
+        <p>Nikmati perawatan spa profesional tanpa perlu keluar rumah. Pilih treatment, tentukan jadwal, lalu biarkan Home Spa Family datang untuk memberikan pengalaman yang privat, higienis, dan fleksibel.</p>
+        <div class="hero-actions">
+          <a class="gold-btn" href="#booking">BOOKING SEKARANG</a>
+          <a class="wa-btn" href="https://wa.me/6283195585892?text=Halo%20Home%20Spa%20Family%2C%20saya%20ingin%20bertanya%20tentang%20layanan%20home%20service." target="_blank" rel="noopener">💬 CHAT WHATSAPP</a>
+        </div>
+        <div class="mini-note">Belum tahu treatment yang cocok? Tanya Santi, customer service AI kami. 😊</div>
       </div>
     </div>
 
@@ -482,6 +780,10 @@
         </div>
 
         <button class="gold-btn" type="submit">KONFIRMASI VIA WHATSAPP</button>
+        <div class="booking-trust">
+          <div>🔒 Data booking aman</div>
+          <div>💬 Konfirmasi via WhatsApp</div>
+        </div>
       </form>
     </aside>
   </section>
@@ -503,6 +805,9 @@
       <div class="service"><div class="service-icon">👁️</div><h3>Gurah mata</h3><p>Pembersihan & kesegaran mata</p><div class="price">Rp 150.000</div></div>
       <div class="service"><div class="service-icon">🩹</div><h3>Bekam</h3><p>Terapi kesehatan tubuh</p><div class="price">Rp 300.000</div></div>
     </div>
+    <div style="text-align:center;margin-top:-18px;">
+      <a class="gold-btn" href="#booking">PILIH LAYANAN & BOOKING</a>
+    </div>
   </section>
 
   <!-- 2. PAKET SPA -->
@@ -516,6 +821,7 @@
           <span class="duration">⏱ Durasi 1,5 jam</span>
         </div>
         <div class="card-price">Rp 230.000</div>
+        <div class="package-actions"><a class="package-book" href="#booking" onclick="selectServiceByText('Paket Manja')">PILIH PAKET</a></div>
       </article>
       <article class="package-card">
         <div>
@@ -524,14 +830,16 @@
           <span class="duration">⏱ Durasi 1,5 jam</span>
         </div>
         <div class="card-price">Rp 210.000</div>
+        <div class="package-actions"><a class="package-book" href="#booking" onclick="selectServiceByText('Paket Rilex')">PILIH PAKET</a></div>
       </article>
-      <article class="package-card">
+      <article class="package-card popular">
         <div>
           <h3>PAKET KOMPLIT</h3>
           <p>Body massage + facial + masker + scrub</p>
           <span class="duration">⏱ Durasi 2,5 jam</span>
         </div>
         <div class="card-price">Rp 350.000</div>
+        <div class="package-actions"><a class="package-book" href="#booking" onclick="selectServiceByText('Paket Komplit')">PILIH PAKET</a></div>
       </article>
     </div>
   </section>
@@ -547,6 +855,7 @@
           <span class="duration">⏱ Durasi 70 menit</span>
         </div>
         <div class="card-price">Rp 175.000</div>
+        <div class="package-actions"><a class="package-book" href="#booking" onclick="selectServiceByText('Panggilan: Body Massage 70 Menit')">BOOKING HOME SERVICE</a></div>
       </article>
       <article class="package-card">
         <div>
@@ -555,6 +864,7 @@
           <span class="duration">⏱ Total 90 menit</span>
         </div>
         <div class="card-price">Rp 275.000</div>
+        <div class="package-actions"><a class="package-book" href="#booking" onclick="selectServiceByText('Panggilan: Paket Rilex 90 Menit')">BOOKING HOME SERVICE</a></div>
       </article>
       <article class="package-card">
         <div>
@@ -563,6 +873,7 @@
           <span class="duration">⏱ Durasi 150 menit</span>
         </div>
         <div class="card-price">Rp 375.000</div>
+        <div class="package-actions"><a class="package-book" href="#booking" onclick="selectServiceByText('Panggilan: Paket Komplit 150 Menit')">BOOKING HOME SERVICE</a></div>
       </article>
     </div>
 
@@ -591,12 +902,76 @@
     </div>
   </section>
 
+
+  <!-- ALUR BOOKING -->
+  <section class="section steps-section" id="cara-booking">
+    <div class="subheading-bar">CARA BOOKING</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <strong>Pilih Treatment</strong>
+        <p>Pilih layanan atau paket yang paling sesuai dengan kebutuhan Anda.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <strong>Tentukan Jadwal</strong>
+        <p>Isi tanggal, jam, nama, nomor WhatsApp, dan alamat kunjungan.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <strong>Konfirmasi WhatsApp</strong>
+        <p>Data booking dikirim ke WhatsApp Home Spa Family untuk konfirmasi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" id="faq">
+    <div class="subheading-bar">FAQ</div>
+    <div class="faq-list">
+      <details>
+        <summary>Apakah Home Spa Family melayani home service?</summary>
+        <p>Ya. Home Spa Family melayani perawatan di salon dan home service (panggilan) sesuai layanan yang tersedia.</p>
+      </details>
+      <details>
+        <summary>Bagaimana cara melakukan booking?</summary>
+        <p>Pilih layanan pada form booking, tentukan tanggal dan jam, isi data pemesan serta alamat, lalu tekan tombol konfirmasi via WhatsApp. Jadwal dan terapis akan dikonfirmasi melalui WhatsApp.</p>
+      </details>
+      <details>
+        <summary>Jam layanan Home Spa Family?</summary>
+        <p>Jam layanan yang tercantum saat ini adalah 08.00–21.00 WIB.</p>
+      </details>
+      <details>
+        <summary>Apakah bisa bertanya dulu sebelum booking?</summary>
+        <p>Tentu. Anda bisa bertanya kepada Santi, customer service AI di website, atau menghubungi WhatsApp Home Spa Family secara langsung.</p>
+      </details>
+      <details>
+        <summary>Di mana lokasi salon Home Spa Family?</summary>
+        <p>Alamat salon: Jl. Otista, Perum Bumi Ciharalang Lestari, Ciharalang, Cijeungjing - Ciamis.</p>
+      </details>
+      <details>
+        <summary>Apakah waktu booking langsung pasti tersedia?</summary>
+        <p>Belum tentu. Form website mengirim permintaan booking ke WhatsApp, sehingga ketersediaan jadwal dan terapis tetap perlu dikonfirmasi.</p>
+      </details>
+    </div>
+  </section>
+
   <section class="about" id="tentang">
     <div class="about-image"></div>
     <div class="about-copy">
       <h2>Relaksasi Nyaman, Di Rumah Anda</h2>
       <p>Home Spa Family menghadirkan pengalaman spa yang hangat, privat, dan personal untuk keluarga. Cukup pilih layanan melalui sistem booking kami, tentukan waktu kunjungan, dan terapis kami akan tiba tepat waktu.</p>
       <a class="gold-btn" href="#booking">BOOKING SEKARANG</a>
+    </div>
+  </section>
+
+
+  <section class="final-cta">
+    <h2>Siap Memanjakan Diri di Rumah?</h2>
+    <p>Pilih treatment favorit Anda, tentukan waktu kunjungan, dan kirim booking. Untuk rekomendasi treatment, Santi siap membantu lewat chat.</p>
+    <div class="final-cta-actions">
+      <a class="gold-btn" href="#booking">BOOKING SEKARANG</a>
+      <a class="wa-btn" href="https://wa.me/6283195585892?text=Halo%20Home%20Spa%20Family%2C%20saya%20ingin%20booking%20home%20service." target="_blank" rel="noopener">💬 WHATSAPP HOME SPA FAMILY</a>
     </div>
   </section>
 
@@ -641,13 +1016,17 @@
       <button onclick="sendChatMessage()" aria-label="Kirim">➤</button>
     </div>
   </div>
+  <span class="chat-label">Tanya Santi 😊</span>
   <button class="chat-btn" onclick="toggleChat()" aria-label="Chat">💬</button>
 </div>
 
 <script>
   // Kunci batas tanggal minimal booking ke hari ini
   document.addEventListener('DOMContentLoaded', function() {
-    const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const localToday = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+      .toISOString().split('T')[0];
+    const today = localToday;
     const dateInput = document.getElementById('date');
     if (dateInput) {
       dateInput.setAttribute('min', today);
@@ -718,6 +1097,22 @@
     container.scrollTop = container.scrollHeight;
   }
 
+
+  // Pilih otomatis layanan dari tombol paket.
+  function selectServiceByText(label){
+    const select = document.getElementById('service');
+    if(!select) return;
+    const options = Array.from(select.options);
+    const target = options.find(opt => opt.value.startsWith(label) || opt.textContent.includes(label));
+    if(target){
+      select.value = target.value;
+    }
+    setTimeout(() => {
+      document.getElementById('booking')?.scrollIntoView({behavior:'smooth', block:'start'});
+      document.getElementById('date')?.focus();
+    }, 80);
+  }
+
   // LOGIKA FORM BOOKING KE WHATSAPP
   function submitBooking(e){
     e.preventDefault();
@@ -732,6 +1127,14 @@
 
     if (!service || !date || !time || !name || !wa || !address) {
       alert('Mohon lengkapi semua kolom yang wajib diisi!');
+      return;
+    }
+
+    const cleanWa = wa.replace(/[^0-9+]/g, '');
+    const waDigits = cleanWa.replace(/^\+/, '');
+    if(waDigits.length < 9){
+      alert('Mohon masukkan nomor WhatsApp yang valid.');
+      document.getElementById('wa').focus();
       return;
     }
 
@@ -761,5 +1164,12 @@
     window.open(waUrl, '_blank');
   }
 </script>
+
+<!-- CTA STICKY MOBILE -->
+<div class="mobile-bottom-cta">
+  <a href="#booking">📅 BOOKING</a>
+  <a href="https://wa.me/6283195585892?text=Halo%20Home%20Spa%20Family%2C%20saya%20ingin%20bertanya%20tentang%20layanan." target="_blank" rel="noopener">💬 WHATSAPP</a>
+</div>
+
 </body>
 </html>

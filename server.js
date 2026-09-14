@@ -58,10 +58,11 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// GET - Info status server + storage
-app.get('/api/health', (req, res) => {
+// GET - Info status server + storage (tersedia lokal & Vercel)
+const healthHandler = (req, res) => {
   res.json({ success: true, time: new Date().toISOString(), ...store.getStorageInfo() });
-});
+};
+app.get('/api/health', healthHandler);
 
 // POST - Chat Santi lokal (proxy ke Gemini, logika sama dengan api/chat.js di Vercel)
 app.post('/api/chat', async (req, res) => {
@@ -357,3 +358,4 @@ if (require.main === module) {
 }
 
 module.exports = app;
+module.exports.healthHandler = healthHandler;

@@ -93,7 +93,7 @@ app.post('/api/chat', async (req, res) => {
     'Facial+masker 150rb, Creambath 100rb, Masker rambut 85rb, Scrub 100rb, Kerokan 30rb, Cuci catok 30rb,',
     'Gurah mata 150rb, Bekam 300rb. Paket: Manja 230rb/1,5jam, Rilex 210rb/1,5jam, Komplit 350rb/2,5jam.',
     'Home service: Body Massage 175rb/70mnt, Paket Rilex 275rb/90mnt, Paket Komplit 375rb/150mnt.',
-    'Untuk booking arahkan ke formulir BOOKING ONLINE di website. WA admin 0831-9558-5892 hanya jika diminta.'
+    'Untuk booking arahkan ke formulir BOOKING ONLINE di website. WA admin 0851-2624-6175 hanya jika diminta.'
   ].join('\n');
   const models = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'];
   let lastError = '';

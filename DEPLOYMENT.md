@@ -25,7 +25,7 @@ Buka project → **Settings → Environment Variables**, tambahkan:
 | `SUPABASE_URL` | `https://kyxqufvwvofdaohqlknf.supabase.co` | Dipakai `bookingStore.js`. |
 | `SUPABASE_ANON_KEY` | `sb_publishable_rtYWrrHVTHa01NoLU1OV2A_Alazj31d` | Atau `SUPABASE_SERVICE_ROLE_KEY` bila ada (lebih aman untuk backend). |
 | `ADMIN_KEY` | `e50f53aa53d13d69ad6dff1ac0b7a0b8522653a17d371050` | Kunci login `/admin`. Samakan dengan `.env` lokal. |
-| `WHATSAPP_NUMBER` | `6283195585892` | Nomor admin untuk link WA. |
+| `WHATSAPP_NUMBER` | `6285126246175` | Nomor admin untuk link WA. |
 | `NODE_ENV` | `production` | Standar. |
 
 > Nilai `SUPABASE_*` dan `ADMIN_KEY` di atas sama persis dengan `.env` lokal
@@ -70,5 +70,5 @@ vercel --prod
 ## Support
 
 - Vercel Docs: https://vercel.com/docs
-- WhatsApp Admin: 0831-9558-5892
+- WhatsApp Admin: 0851-2624-6175
 

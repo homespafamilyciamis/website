@@ -83,7 +83,7 @@ JAM OPERASIONAL
 Setiap hari, pukul 08.00 - 21.00 WIB.
 
 WHATSAPP ADMIN
-0831-9558-5892.
+0851-2624-6175.
 HANYA sebutkan nomor WhatsApp ini jika pelanggan secara khusus meminta nomor kontak/admin.
 
 ATURAN LOKASI

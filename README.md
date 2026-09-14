@@ -185,7 +185,7 @@ Untuk menambahkan dashboard admin, bisa membuat:
 
 ## Support & Contact
 
-- **WhatsApp:** 0831-9558-5892
+- **WhatsApp:** 0851-2624-6175
 - **Email:** help@homespafamily.com
 
 ## License

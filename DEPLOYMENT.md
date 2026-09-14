@@ -1,151 +1,74 @@
-# Vercel Deployment Guide - Home Spa Family Website
+# Vercel Deployment — Home Spa Family Website
 
-## Quick Start dengan Vercel
+Repo: `https://github.com/homespafamilyciamis/website` (branch `main`)
+Output: folder `public/` (lihat `vercel.json`)
+API: `api/*.js` serverless (chat Santi + booking Supabase)
+DB: Supabase project `kyxqufvwvofdaohqlknf`, tabel `public.bookings` (lihat `supabase.sql`)
 
-Vercel adalah platform terbaik untuk deploy aplikasi Node.js + Frontend dengan cepat dan gratis!
+## A. Hubungkan Vercel ↔ GitHub (sekali saja)
 
-### Step 1: Persiapan di GitHub
-
-Website sudah siap di: `https://github.com/homespafamilyciamis/website`
-
-### Step 2: Deploy ke Vercel
-
-#### Metode 1: Connect GitHub (Recommended)
-
-1. Buka https://vercel.com
-2. Klik **"Sign Up"** dan login dengan GitHub
-3. Klik **"New Project"**
-4. Pilih repository **"website"** dari homespafamilyciamis
-5. Klik **"Import"**
-6. Di halaman konfigurasi:
-   - Framework: **Pilih "Other" atau skip**
-   - Build Command: `npm install`
-   - Install Command: `npm run build` (jika tidak ada, kosongkan)
+1. Buka https://vercel.com → login dengan akun GitHub **homespafamilyciamis**.
+2. **Add New → Project → Import** repository `homespafamilyciamis/website`.
+3. Pada form Configure Project, biarkan sesuai `vercel.json`:
+   - Framework Preset: **Other**
+   - Build Command: kosongkan (tidak ada build step)
    - Output Directory: `public`
-   - Environment Variables: Tambahkan dari `.env`
-7. Klik **"Deploy"**
+4. JANGAN klik Deploy dulu — isi Environment Variables di bawah, baru Deploy.
 
-#### Metode 2: Vercel CLI
+## B. Environment Variables (wajib, Production + Preview + Development)
 
-```bash
-# Install Vercel CLI
+Buka project → **Settings → Environment Variables**, tambahkan:
+
+| Key | Nilai | Keterangan |
+|---|---|---|
+| `GEMINI_API_KEY` | (kunci Gemini Anda) | Sudah ada — jangan diubah. Dipakai `api/chat.js` (Santi). |
+| `SUPABASE_URL` | `https://kyxqufvwvofdaohqlknf.supabase.co` | Dipakai `bookingStore.js`. |
+| `SUPABASE_ANON_KEY` | `sb_publishable_rtYWrrHVTHa01NoLU1OV2A_Alazj31d` | Atau `SUPABASE_SERVICE_ROLE_KEY` bila ada (lebih aman untuk backend). |
+| `ADMIN_KEY` | `e50f53aa53d13d69ad6dff1ac0b7a0b8522653a17d371050` | Kunci login `/admin`. Samakan dengan `.env` lokal. |
+| `WHATSAPP_NUMBER` | `6283195585892` | Nomor admin untuk link WA. |
+| `NODE_ENV` | `production` | Standar. |
+
+> Nilai `SUPABASE_*` dan `ADMIN_KEY` di atas sama persis dengan `.env` lokal
+> (file `.env` TIDAK ikut commit — hanya `.env.example` yang ada di git).
+
+Setelah semua terisi → **Deploy** (atau **Redeploy** jika project sudah ada).
+
+## C. Verifikasi "terhubung penuh" (checklist)
+
+1. **Deployments** hijau (Ready), bukan Error.
+2. Buka URL produksi, mis. `https://website-xxx.vercel.app`:
+   - `/` tampil (landing + form booking).
+   - `/admin` tampil (login ADMIN_KEY).
+   - `/api/health` → `{"success":true,"storage":"supabase"}`.
+3. Test booking dari website → cek baris baru di Supabase
+   **Table Editor → bookings**, dan muncul di `/admin`.
+4. Test chat Santi → dapat balasan (bukan pesan error konfigurasi).
+5. Setiap `git push origin main` → muncul deployment baru otomatis di tab
+   **Deployments** (artinya webhook GitHub ↔ Vercel jalan).
+
+## D. Vercel CLI di laptop (opsional, untuk cek dari terminal)
+
+```cmd
 npm install -g vercel
-
-# Di folder website
-cd website
-
-# Deploy
-vercel
+cd "c:\Website salon"
+vercel login
+vercel link
+vercel env ls
+vercel --prod
 ```
-
-### Step 3: Setup Environment Variables di Vercel
-
-1. Buka project Vercel
-2. Masuk ke **Settings** → **Environment Variables**
-3. Tambahkan variable:
-   - `NODE_ENV` = `production`
-   - `PORT` = `3000`
-   - `WHATSAPP_NUMBER` = `6283195585892`
-
-### Step 4: Konfigurasi Custom Domain (Opsional)
-
-1. Di Vercel, masuk ke **Settings** → **Domains**
-2. Tambahkan domain Anda
-3. Follow petunjuk untuk update DNS
 
 ## Troubleshooting
 
-### Website error 404
-- Pastikan file ada di folder `public/`
-- Check `vercel.json` configuration
-- Rebuild: Klik "Redeploy" di Vercel dashboard
-
-### API tidak bekerja
-- Check server logs di Vercel
-- Pastikan PORT di set ke 3000
-- Verifikasi database connection
-
-### File tidak ter-upload
-- Periksa `.gitignore`
-- Pastikan file tidak diabaikan
-- Push ulang ke GitHub
-
-## URL Website Setelah Deploy
-
-Website akan tersedia di: `https://your-project.vercel.app`
-
-Contoh: `https://home-spa-family.vercel.app`
-
-## Monitoring & Logs
-
-1. Buka Vercel Dashboard
-2. Pilih project
-3. Tab **"Deployments"** - lihat history
-4. Tab **"Functions"** - lihat API logs
-5. Tab **"Analytics"** - lihat traffic
-
-## Automatic Deployment
-
-Setiap kali push ke GitHub branch `main`, Vercel akan otomatis:
-1. Build ulang
-2. Deploy ke production
-3. Update live website
-
-## Manual Redeploy
-
-1. Buka project di Vercel
-2. Tab **"Deployments"**
-3. Klik 3 dots pada deployment terbaru
-4. Pilih **"Redeploy"**
-
-## Tips Penting
-
-✅ **Do:**
-- Gunakan `.env` untuk secret variables
-- Test locally sebelum push ke GitHub
-- Check Vercel logs saat error
-- Backup database regularly
-
-❌ **Don't:**
-- Jangan commit `.env` ke GitHub
-- Jangan push `node_modules`
-- Jangan hardcode credentials
-- Jangan gunakan large files (>50MB)
-
-## Upgrade ke Plan Berbayar (Opsional)
-
-**Fitur Gratis Sudah Cukup Untuk:**
-- Traffic unlimited
-- 1 Production deployment
-- 50 Serverless Functions
-- Custom domains
-
-**Upgrade jika butuh:**
-- Priority support
-- Team collaboration
-- Advanced security
-- Custom runtimes
-
-## Production Checklist
-
-Sebelum go live, pastikan:
-- [ ] Website responsive di mobile
-- [ ] Booking form berfungsi
-- [ ] WhatsApp integration works
-- [ ] Database backup setup
-- [ ] Domain custom configured
-- [ ] Email notifications ready
-- [ ] Analytics tracking active
-- [ ] Security headers set
-- [ ] HTTPS enabled (automatic)
-- [ ] 404 error page setup
+| Gejala | Penyebab umum | Solusi |
+|---|---|---|
+| `/api/health` → `storage: json-file` | Env Supabase belum diset di Vercel | Isi Bagian B, lalu Redeploy (env hanya terbaca saat deploy). |
+| Chat balas "kendala konfigurasi" | `GEMINI_API_KEY` kosong di Vercel | Isi key, Redeploy. |
+| `/admin` → 401 Unauthorized | `ADMIN_KEY` di browser beda dengan di Vercel | Login pakai nilai tabel Bagian B. |
+| Push ke GitHub tidak memicu deploy | Repo belum di-import / webhook putus | Vercel → Settings → Git → Connect / periksa autodeploy branch `main`. |
+| 404 untuk `/api/...` | File `api/` tidak ikut commit | `git ls-files api` harus ada 6 file; push ulang. |
 
 ## Support
 
-**Vercel Docs:** https://vercel.com/docs
-**GitHub Issues:** Report bug di repository
-**WhatsApp Support:** 0831-9558-5892
+- Vercel Docs: https://vercel.com/docs
+- WhatsApp Admin: 0831-9558-5892
 
----
-
-**Website siap di:** https://vercel.com 🚀

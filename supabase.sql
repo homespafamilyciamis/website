@@ -32,13 +32,13 @@ create index if not exists bookings_status_idx on public.bookings (status);
 alter table public.bookings disable row level security;
 
 -- ============================================================
--- Tabel riwayat chat WhatsApp untuk Santi AI
+-- Tabel riwayat chat WhatsApp untuk Eva AI
 -- (auto-reply via Fonnte webhook: api/wa-webhook.js)
 -- ============================================================
 create table if not exists public.wa_messages (
   id bigint generated always as identity primary key,
   chat_id text not null,
-  sender_type text not null check (sender_type in ('customer', 'santi')),
+  sender_type text not null check (sender_type in ('customer', 'eva')),
   message text not null,
   created_at timestamptz not null default now()
 );

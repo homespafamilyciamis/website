@@ -1,16 +1,16 @@
 // ============================================================
 // Vercel Serverless: POST /api/wa-webhook
-// HOME SPA FAMILY — Santi AI Auto-Reply WhatsApp (via Fonnte)
+// HOME SPA FAMILY — Eva AI Auto-Reply WhatsApp (via Fonnte)
 //
 // Alur:
 //   Pelanggan kirim WA -> Fonnte -> webhook ini -> Supabase
-//   (riwayat) -> Gemini (Santi) -> Fonnte send -> pelanggan.
+//   (riwayat) -> Gemini (Eva) -> Fonnte send -> pelanggan.
 //
 // Pengaturan di Fonnte Dashboard (Device -> Edit):
 //   - Webhook URL : https://www.homespafamily.my.id/api/wa-webhook
 //   - Auto read   : ON (wajib, tanpa ini webhook tidak jalan)
 // ============================================================
-const { generateSantiReply, FALLBACK_REPLY } = require('../santi');
+const { generateEvaReply, FALLBACK_REPLY } = require('../eva');
 const waStore = require('../waChatStore');
 
 const FONNTE_SEND_URL = 'https://api.fonnte.com/send';
@@ -73,7 +73,7 @@ async function sendFonnte(target, message, inboxid) {
 module.exports = async function handler(req, res) {
   // GET = pengecekan URL webhook saat setup di dashboard Fonnte
   if (req.method === 'GET') {
-    return res.status(200).json({ success: true, service: 'santi-wa-webhook' });
+    return res.status(200).json({ success: true, service: 'eva-wa-webhook' });
   }
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -142,7 +142,7 @@ module.exports = async function handler(req, res) {
       return ack();
     }
 
-    // Riwayat percakapan untuk konteks Santi (16 pesan terakhir)
+    // Riwayat percakapan untuk konteks Eva (16 pesan terakhir)
     const recent = await waStore.getRecentMessages(sender, 16);
     const history = recent
       .filter(row => !saved || row.id !== saved.id)
@@ -151,8 +151,8 @@ module.exports = async function handler(req, res) {
         text: row.message
       }));
 
-    // Tanya Santi (Gemini)
-    const result = await generateSantiReply({
+    // Tanya Eva (Gemini)
+    const result = await generateEvaReply({
       apiKey,
       message,
       history,
@@ -164,9 +164,9 @@ module.exports = async function handler(req, res) {
       console.error('[wa-webhook] Gemini gagal:', result.error);
     }
 
-    // Simpan balasan Santi ke riwayat
+    // Simpan balasan Eva ke riwayat
     try {
-      await waStore.saveMessage(sender, 'santi', reply);
+      await waStore.saveMessage(sender, 'eva', reply);
     } catch (err) {
       console.error('[wa-webhook] gagal simpan balasan:', err && err.message);
     }

@@ -1,7 +1,7 @@
 // ============================================================
 // HOME SPA FAMILY — Supabase data layer untuk riwayat chat WA
 // Tabel: public.wa_messages (chat_id, sender_type, message)
-// Dipakai oleh api/wa-webhook.js (Santi AI auto-reply Fonnte)
+// Dipakai oleh api/wa-webhook.js (Eva AI auto-reply Fonnte)
 // ============================================================
 
 const TABLE = 'wa_messages';

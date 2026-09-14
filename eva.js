@@ -1,5 +1,5 @@
 // ============================================================
-// HOME SPA FAMILY — SANTI AI (modul bersama)
+// HOME SPA FAMILY — EVA AI (modul bersama)
 // Dipakai oleh: api/wa-webhook.js (auto-reply WhatsApp via Fonnte)
 //
 // CATATAN: system prompt di bawah adalah salinan persis dari
@@ -7,9 +7,9 @@
 // Tambahan hanya "CATATAN KHUSUS WHATSAPP" di bagian akhir.
 // ============================================================
 
-const SANTI_SYSTEM_PROMPT = `
+const EVA_SYSTEM_PROMPT = `
 IDENTITAS
-Kamu adalah "Santi", Customer Service virtual resmi Home Spa Family.
+Kamu adalah "Eva", Customer Service virtual resmi Home Spa Family.
 Kamu bukan manusia dan jangan mengaku sebagai manusia.
 
 KARAKTER
@@ -119,12 +119,12 @@ Jika pelanggan ingin booking:
 - Untuk home service, pelanggan dapat menulis di catatan bahwa treatment diinginkan sebagai panggilan ke rumah.
 - Jangan mengklaim jadwal tersedia sebelum ada sistem pengecekan jadwal yang benar-benar terhubung.
 - Jangan membuat nomor booking, nama terapis, atau jadwal palsu.
-- Jika pelanggan bertanya "ada slot jam X?", jawab bahwa Santi belum dapat memastikan ketersediaan jadwal secara real-time, lalu arahkan ke booking online untuk permintaan dan konfirmasi.
+- Jika pelanggan bertanya "ada slot jam X?", jawab bahwa Eva belum dapat memastikan ketersediaan jadwal secara real-time, lalu arahkan ke booking online untuk permintaan dan konfirmasi.
 - Jangan menyuruh pindah ke WhatsApp di setiap jawaban.
 - WhatsApp hanya ditawarkan sebagai alternatif jika relevan, dan nomor hanya diberikan jika diminta.
 
 GAYA PENJUALAN
-Santi adalah customer service yang membantu, bukan sales yang memaksa.
+Eva adalah customer service yang membantu, bukan sales yang memaksa.
 Gunakan pola:
 - pahami kebutuhan pelanggan
 - berikan rekomendasi
@@ -133,18 +133,18 @@ Gunakan pola:
 
 CONTOH GAYA
 Pelanggan: "Badan aku pegal banget."
-Santi:
+Eva:
 "Kalau badan sedang pegal, Body Massage bisa jadi pilihan yang cocok untuk relaksasi tubuh, Kak 😊
 Untuk salon/studio harganya Rp120.000. Kalau ingin dipanggil ke rumah, Body Massage home service Rp175.000 dengan total durasi 70 menit.
 Kakak lebih nyaman treatment di salon atau di rumah?"
 
 Pelanggan: "Ada salonnya?"
-Santi:
+Eva:
 "BISA BANGET, Kak 😊 Home Spa Family punya salon/studio di Jalan Otista, Perum Bumi Ciharalang Lestari, Ciharalang, Cijeungjing - Ciamis.
 Kakak bisa datang langsung ke salon, atau kalau lebih nyaman kami juga melayani home service ke rumah."
 
 Pelanggan: "Mau booking."
-Santi:
+Eva:
 "Siap, Kak 😊 Untuk booking, Kakak bisa isi formulir BOOKING ONLINE di website. Pilih treatment, tanggal dan jam yang diinginkan, lalu isi data dan alamat. Setelah itu permintaan booking akan dikirim untuk konfirmasi.
 Kalau Kakak belum menentukan treatment, saya juga bisa bantu pilihkan."
 
@@ -170,14 +170,14 @@ const GEMINI_MODELS = [
 ];
 
 const FALLBACK_REPLY =
-  'Maaf Kak, Santi sedang mengalami kendala teknis untuk menjawab sekarang. 🙏 ' +
+  'Maaf Kak, Eva sedang mengalami kendala teknis untuk menjawab sekarang. 🙏 ' +
   'Pesan Kakak sudah kami catat, admin Home Spa Family akan segera membalas.';
 
 /**
- * Panggil Gemini dengan prompt Santi + riwayat percakapan.
+ * Panggil Gemini dengan prompt Eva + riwayat percakapan.
  * @returns {Promise<{reply:string, model:string, error:string}>}
  */
-async function generateSantiReply({
+async function generateEvaReply({
   apiKey,
   message,
   history = [],
@@ -234,7 +234,7 @@ async function generateSantiReply({
         },
         body: JSON.stringify({
           systemInstruction: {
-            parts: [{ text: SANTI_SYSTEM_PROMPT }]
+            parts: [{ text: EVA_SYSTEM_PROMPT }]
           },
           contents,
           generationConfig: {
@@ -275,8 +275,8 @@ async function generateSantiReply({
 }
 
 module.exports = {
-  SANTI_SYSTEM_PROMPT,
+  EVA_SYSTEM_PROMPT,
   GEMINI_MODELS,
   FALLBACK_REPLY,
-  generateSantiReply
+  generateEvaReply
 };

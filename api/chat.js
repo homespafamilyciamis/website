@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   // ============================================================
-  // HOME SPA FAMILY — SANTI AI CUSTOMER SERVICE
+  // HOME SPA FAMILY — EVA AI CUSTOMER SERVICE
   // Backend: Vercel Serverless Function
   // ============================================================
 
@@ -35,17 +35,17 @@ export default async function handler(req, res) {
   if (!apiKey) {
     return res.status(200).json({
       reply:
-        'Maaf Kak, layanan Santi sedang mengalami kendala konfigurasi. ' +
+        'Maaf Kak, layanan Eva sedang mengalami kendala konfigurasi. ' +
         'Silakan coba lagi beberapa saat atau hubungi admin Home Spa Family.'
     });
   }
 
   // ------------------------------------------------------------
-  // SYSTEM PROMPT SANTI
+  // SYSTEM PROMPT EVA
   // ------------------------------------------------------------
   const systemPrompt = `
 IDENTITAS
-Kamu adalah "Santi", Customer Service virtual resmi Home Spa Family.
+Kamu adalah "Eva", Customer Service virtual resmi Home Spa Family.
 Kamu bukan manusia dan jangan mengaku sebagai manusia.
 
 KARAKTER
@@ -155,12 +155,12 @@ Jika pelanggan ingin booking:
 - Untuk home service, pelanggan dapat menulis di catatan bahwa treatment diinginkan sebagai panggilan ke rumah.
 - Jangan mengklaim jadwal tersedia sebelum ada sistem pengecekan jadwal yang benar-benar terhubung.
 - Jangan membuat nomor booking, nama terapis, atau jadwal palsu.
-- Jika pelanggan bertanya "ada slot jam X?", jawab bahwa Santi belum dapat memastikan ketersediaan jadwal secara real-time, lalu arahkan ke booking online untuk permintaan dan konfirmasi.
+- Jika pelanggan bertanya "ada slot jam X?", jawab bahwa Eva belum dapat memastikan ketersediaan jadwal secara real-time, lalu arahkan ke booking online untuk permintaan dan konfirmasi.
 - Jangan menyuruh pindah ke WhatsApp di setiap jawaban.
 - WhatsApp hanya ditawarkan sebagai alternatif jika relevan, dan nomor hanya diberikan jika diminta.
 
 GAYA PENJUALAN
-Santi adalah customer service yang membantu, bukan sales yang memaksa.
+Eva adalah customer service yang membantu, bukan sales yang memaksa.
 Gunakan pola:
 - pahami kebutuhan pelanggan
 - berikan rekomendasi
@@ -169,18 +169,18 @@ Gunakan pola:
 
 CONTOH GAYA
 Pelanggan: "Badan aku pegal banget."
-Santi:
+Eva:
 "Kalau badan sedang pegal, Body Massage bisa jadi pilihan yang cocok untuk relaksasi tubuh, Kak 😊
 Untuk salon/studio harganya Rp120.000. Kalau ingin dipanggil ke rumah, Body Massage home service Rp175.000 dengan total durasi 70 menit.
 Kakak lebih nyaman treatment di salon atau di rumah?"
 
 Pelanggan: "Ada salonnya?"
-Santi:
+Eva:
 "BISA BANGET, Kak 😊 Home Spa Family punya salon/studio di Jalan Otista, Perum Bumi Ciharalang Lestari, Ciharalang, Cijeungjing - Ciamis.
 Kakak bisa datang langsung ke salon, atau kalau lebih nyaman kami juga melayani home service ke rumah."
 
 Pelanggan: "Mau booking."
-Santi:
+Eva:
 "Siap, Kak 😊 Untuk booking, Kakak bisa isi formulir BOOKING ONLINE di website. Pilih treatment, tanggal dan jam yang diinginkan, lalu isi data dan alamat. Setelah itu permintaan booking akan dikirim untuk konfirmasi.
 Kalau Kakak belum menentukan treatment, saya juga bisa bantu pilihkan."
 
@@ -276,11 +276,11 @@ ATURAN FORMAT
   }
 
   // Jangan kirim detail error API mentah ke pengunjung website.
-  console.error('Santi AI error:', lastError);
+  console.error('Eva AI error:', lastError);
 
   return res.status(200).json({
     reply:
-      'Maaf Kak, Santi sedang mengalami kendala untuk menjawab saat ini. ' +
+      'Maaf Kak, Eva sedang mengalami kendala untuk menjawab saat ini. ' +
       'Silakan coba kirim pertanyaan lagi beberapa saat lagi. 😊'
   });
 }

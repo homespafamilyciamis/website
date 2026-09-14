@@ -777,7 +777,7 @@
   .footer a:hover{color:#fff}
 
   /* =========================
-     CHAT SANTI
+     CHAT EVA
      ========================= */
   .chat{
     position:fixed;
@@ -1124,7 +1124,7 @@
           <a class="gold-btn" href="#booking">BOOKING SEKARANG</a>
           <a class="wa-btn" href="https://wa.me/6283195585892?text=Halo%20Home%20Spa%20Family%2C%20saya%20ingin%20bertanya%20tentang%20layanan%20home%20service." target="_blank" rel="noopener">💬 CHAT WHATSAPP</a>
         </div>
-        <div class="mini-note">Belum tahu treatment yang cocok? Tanya Santi, customer service AI kami. 😊</div>
+        <div class="mini-note">Belum tahu treatment yang cocok? Tanya Eva, customer service AI kami. 😊</div>
          <div class="hero-benefits" aria-label="Keunggulan Home Spa Family">
            <div><span>⌂</span><strong>Home Service<br>& Salon</strong></div>
            <div><span>♙</span><strong>Terapis<br>Berpengalaman</strong></div>
@@ -1365,7 +1365,7 @@
       </details>
       <details>
         <summary>Apakah bisa bertanya dulu sebelum booking?</summary>
-        <p>Tentu. Anda bisa bertanya kepada Santi, customer service AI di website, atau menghubungi WhatsApp Home Spa Family secara langsung.</p>
+        <p>Tentu. Anda bisa bertanya kepada Eva, customer service AI di website, atau menghubungi WhatsApp Home Spa Family secara langsung.</p>
       </details>
       <details>
         <summary>Di mana lokasi salon Home Spa Family?</summary>
@@ -1390,7 +1390,7 @@
 
   <section class="final-cta">
     <h2>Siap Memanjakan Diri di Rumah?</h2>
-    <p>Pilih treatment favorit Anda, tentukan waktu kunjungan, dan kirim booking. Untuk rekomendasi treatment, Santi siap membantu lewat chat.</p>
+    <p>Pilih treatment favorit Anda, tentukan waktu kunjungan, dan kirim booking. Untuk rekomendasi treatment, Eva siap membantu lewat chat.</p>
     <div class="final-cta-actions">
       <a class="gold-btn" href="#booking">BOOKING SEKARANG</a>
       <a class="wa-btn" href="https://wa.me/6283195585892?text=Halo%20Home%20Spa%20Family%2C%20saya%20ingin%20booking%20home%20service." target="_blank" rel="noopener">💬 WHATSAPP HOME SPA FAMILY</a>
@@ -1420,25 +1420,25 @@
   </footer>
 </main>
 
-<!-- WIDGET CHAT AI CUSTOMER SERVICE SANTI -->
+<!-- WIDGET CHAT AI CUSTOMER SERVICE EVA -->
 <div class="chat">
   <div class="chat-box" id="chatBox">
     <div class="chat-head">
       <div>
-        <strong>Santi — Customer Service</strong>
+        <strong>Eva — Customer Service</strong>
         <span>● Online </span>
       </div>
       <button class="chat-close" onclick="toggleChat()" aria-label="Tutup">✕</button>
     </div>
     <div class="chat-messages" id="chatMessages">
-      <div class="msg bot">Halo Kak! Selamat datang di Home Spa Family. Ada yang bisa Santi bantu terkait paket spa, perawatan, atau jadwal kunjungan hari ini? 😊</div>
+      <div class="msg bot">Halo Kak! Selamat datang di Home Spa Family. Ada yang bisa Eva bantu terkait paket spa, perawatan, atau jadwal kunjungan hari ini? 😊</div>
     </div>
     <div class="chat-input-area">
       <input id="chatInput" placeholder="Ketik pertanyaan Anda..." onkeypress="handleChatKey(event)">
       <button onclick="sendChatMessage()" aria-label="Kirim">➤</button>
     </div>
   </div>
-  <span class="chat-label">Tanya Santi 😊</span>
+  <span class="chat-label">Tanya Eva 😊</span>
   <button class="chat-btn" onclick="toggleChat()" aria-label="Chat">💬</button>
 </div>
 
@@ -1459,7 +1459,7 @@
     }
   });
 
-  // LOGIKA CHAT AI SANTI
+  // LOGIKA CHAT AI EVA
   function toggleChat(){
     const box = document.getElementById('chatBox');
     box.classList.toggle('open');
@@ -1491,7 +1491,7 @@
     const typing = document.createElement('div');
     typing.className = 'msg typing';
     typing.id = 'typingIndicator';
-    typing.textContent = 'Santi sedang mengetik...';
+    typing.textContent = 'Eva sedang mengetik...';
     container.appendChild(typing);
     container.scrollTop = container.scrollHeight;
 
@@ -1508,7 +1508,7 @@
       // 3. Tampilkan balasan AI
       const botMsg = document.createElement('div');
       botMsg.className = 'msg bot';
-      botMsg.innerText = data.reply || 'Ada yang bisa Santi bantu lagi? 😊';
+      botMsg.innerText = data.reply || 'Ada yang bisa Eva bantu lagi? 😊';
       container.appendChild(botMsg);
     } catch(err) {
       if(document.getElementById('typingIndicator')) {

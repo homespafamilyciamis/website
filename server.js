@@ -64,7 +64,7 @@ const healthHandler = (req, res) => {
 };
 app.get('/api/health', healthHandler);
 
-// POST - Chat Santi lokal (proxy ke Gemini, logika sama dengan api/chat.js di Vercel)
+// POST - Chat Eva lokal (proxy ke Gemini, logika sama dengan api/chat.js di Vercel)
 app.post('/api/chat', async (req, res) => {
   let message = req.body?.message;
   if (!message && typeof req.body === 'string') {
@@ -77,15 +77,15 @@ app.post('/api/chat', async (req, res) => {
   const apiKey = (process.env.GEMINI_API_KEY || '').trim();
   if (!apiKey) {
     return res.status(200).json({
-      reply: 'Maaf Kak, layanan Santi sedang mengalami kendala konfigurasi. ' +
+      reply: 'Maaf Kak, layanan Eva sedang mengalami kendala konfigurasi. ' +
         'Silakan coba lagi beberapa saat atau hubungi admin Home Spa Family.'
     });
   }
-  // Prompt Santi: duplikat dari api/chat.js agar perilaku lokal = produksi.
+  // Prompt Eva: duplikat dari api/chat.js agar perilaku lokal = produksi.
   // Diambil dari file api/chat.js saat runtime tidak memungkinkan (ESM),
   // jadi gunakan prompt ringkas yang konsisten dengan pricelist resmi.
   const systemPrompt = [
-    'Kamu adalah "Santi", Customer Service virtual resmi Home Spa Family.',
+    'Kamu adalah "Eva", Customer Service virtual resmi Home Spa Family.',
     'Ramah, santun, hangat, profesional. Panggil pelanggan dengan "Kak". Jawaban singkat.',
     'Layanan: salon/studio di Jalan Otista, Perum Bumi Ciharalang Lestari, Ciharalang, Cijeungjing - Ciamis;',
     'dan home service wilayah Ciamis. Jam 08.00-21.00 WIB setiap hari.',
@@ -125,9 +125,9 @@ app.post('/api/chat', async (req, res) => {
       clearTimeout(timeout);
     }
   }
-  console.error('Santi AI error (lokal):', lastError);
+  console.error('Eva AI error (lokal):', lastError);
   return res.status(200).json({
-    reply: 'Maaf Kak, Santi sedang mengalami kendala untuk menjawab saat ini. ' +
+    reply: 'Maaf Kak, Eva sedang mengalami kendala untuk menjawab saat ini. ' +
       'Silakan coba kirim pertanyaan lagi beberapa saat lagi.'
   });
 });

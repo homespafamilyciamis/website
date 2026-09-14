@@ -2,7 +2,7 @@
 
 Repo: `https://github.com/homespafamilyciamis/website` (branch `main`)
 Output: folder `public/` (lihat `vercel.json`)
-API: `api/*.js` serverless (chat Santi + booking Supabase)
+API: `api/*.js` serverless (chat Eva + booking Supabase)
 DB: Supabase project `kyxqufvwvofdaohqlknf`, tabel `public.bookings` (lihat `supabase.sql`)
 
 ## A. Hubungkan Vercel ↔ GitHub (sekali saja)
@@ -21,7 +21,7 @@ Buka project → **Settings → Environment Variables**, tambahkan:
 
 | Key | Nilai | Keterangan |
 |---|---|---|
-| `GEMINI_API_KEY` | (kunci Gemini Anda) | Sudah ada — jangan diubah. Dipakai `api/chat.js` (Santi). |
+| `GEMINI_API_KEY` | (kunci Gemini Anda) | Sudah ada — jangan diubah. Dipakai `api/chat.js` (Eva). |
 | `SUPABASE_URL` | `https://kyxqufvwvofdaohqlknf.supabase.co` | Dipakai `bookingStore.js`. |
 | `SUPABASE_ANON_KEY` | `sb_publishable_rtYWrrHVTHa01NoLU1OV2A_Alazj31d` | Atau `SUPABASE_SERVICE_ROLE_KEY` bila ada (lebih aman untuk backend). |
 | `ADMIN_KEY` | `e50f53aa53d13d69ad6dff1ac0b7a0b8522653a17d371050` | Kunci login `/admin`. Samakan dengan `.env` lokal. |
@@ -42,7 +42,7 @@ Setelah semua terisi → **Deploy** (atau **Redeploy** jika project sudah ada).
    - `/api/health` → `{"success":true,"storage":"supabase"}`.
 3. Test booking dari website → cek baris baru di Supabase
    **Table Editor → bookings**, dan muncul di `/admin`.
-4. Test chat Santi → dapat balasan (bukan pesan error konfigurasi).
+4. Test chat Eva → dapat balasan (bukan pesan error konfigurasi).
 5. Setiap `git push origin main` → muncul deployment baru otomatis di tab
    **Deployments** (artinya webhook GitHub ↔ Vercel jalan).
 

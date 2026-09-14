@@ -1528,10 +1528,20 @@
   function selectServiceByText(label){
     const select = document.getElementById('service');
     if(!select) return;
+    const needle = String(label || '').toLowerCase();
     const options = Array.from(select.options);
-    const target = options.find(opt => opt.value.startsWith(label) || opt.textContent.includes(label));
+    // Cari berdasarkan nama layanan (sebelum "|") ATAU teks option, bukan value mentah.
+    const target = options.find(opt => {
+      const raw = String(opt.value || '');
+      const nameOnly = raw.split('|')[0].toLowerCase();
+      const text = String(opt.textContent || '').toLowerCase();
+      return (nameOnly && needle.includes(nameOnly)) ||
+             (nameOnly && nameOnly.includes(needle)) ||
+             text.includes(needle);
+    }) || options.find(opt => String(opt.textContent || '').toLowerCase().includes(needle));
     if(target){
       select.value = target.value;
+      select.dispatchEvent(new Event('change'));
     }
     setTimeout(() => {
       document.getElementById('booking')?.scrollIntoView({behavior:'smooth', block:'start'});
@@ -1539,19 +1549,20 @@
     }, 80);
   }
 
-  // LOGIKA FORM BOOKING KE WHATSAPP
-  function submitBooking(e){
+  // LOGIKA FORM BOOKING: simpan ke backend (Supabase) lalu lanjut ke WhatsApp.
+  // Jika backend gagal, tetap lanjut ke WhatsApp agar pelanggan tidak kehilangan data.
+  async function submitBooking(e){
     e.preventDefault();
 
-    const service = document.getElementById('service').value;
+    const serviceRaw = document.getElementById('service').value;
     const date = document.getElementById('date').value;
     const time = document.getElementById('time').value;
-    const name = document.getElementById('name').value;
-    const wa = document.getElementById('wa').value;
-    const address = document.getElementById('address').value;
-    const note = document.getElementById('note') ? document.getElementById('note').value : '-';
+    const name = document.getElementById('name').value.trim();
+    const wa = document.getElementById('wa').value.trim();
+    const address = document.getElementById('address').value.trim();
+    const note = document.getElementById('note') ? document.getElementById('note').value.trim() : '';
 
-    if (!service || !date || !time || !name || !wa || !address) {
+    if (!serviceRaw || !date || !time || !name || !wa || !address) {
       alert('Mohon lengkapi semua kolom yang wajib diisi!');
       return;
     }
@@ -1564,6 +1575,58 @@
       return;
     }
 
+    const todayJakarta = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit'
+    }).format(new Date());
+    if (date < todayJakarta) {
+      alert('Tanggal booking tidak boleh sebelum hari ini.');
+      document.getElementById('date').focus();
+      return;
+    }
+
+    const parts = String(serviceRaw).split('|');
+    const serviceName = (parts[0] || serviceRaw).trim();
+    const price = (parseInt(parts[1], 10) || 0) * 1000;
+
+    const submitBtn = document.querySelector('#booking button[type="submit"]');
+    const originalBtnText = submitBtn ? submitBtn.textContent : '';
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'MEMPROSES BOOKING...';
+      submitBtn.style.opacity = '0.7';
+    }
+
+    let backendOk = false;
+    try {
+      const res = await fetch('/api/booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service: serviceName,
+          price,
+          tanggal: date,
+          jam: time,
+          nama: name,
+          whatsapp: wa,
+          alamat: address,
+          catatan: note
+        })
+      });
+      const data = await res.json().catch(() => null);
+      backendOk = res.ok && !!(data && data.success);
+      if (!backendOk) {
+        console.error('Booking API error:', (data && data.message) || res.status);
+      }
+    } catch (err) {
+      console.error('Booking API network error:', err);
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText || 'KONFIRMASI VIA WHATSAPP';
+        submitBtn.style.opacity = '';
+      }
+    }
+
     // Format tanggal ke Bahasa Indonesia
     const dateObj = new Date(date + 'T00:00:00');
     const formattedDate = dateObj.toLocaleDateString('id-ID', {
@@ -1573,18 +1636,24 @@
       day: 'numeric'
     });
 
-    const textMessage = 
+    const textMessage =
       `*BOOKING LAYANAN HOME SPA FAMILY*%0A` +
       `----------------------------------------%0A` +
       `*Nama:* ${encodeURIComponent(name)}%0A` +
       `*No. WhatsApp:* ${encodeURIComponent(wa)}%0A` +
-      `*Layanan:* ${encodeURIComponent(service)}%0A` +
+      `*Layanan:* ${encodeURIComponent(serviceName)}%0A` +
       `*Jadwal:* ${encodeURIComponent(formattedDate)}%0A` +
       `*Jam Booking:* ${encodeURIComponent(time)} WIB%0A` +
       `*Alamat:* ${encodeURIComponent(address)}%0A` +
       `*Catatan:* ${encodeURIComponent(note || '-')}%0A` +
       `----------------------------------------%0A` +
       `Mohon konfirmasi ketersediaan jadwal dan terapis. Terima kasih!`;
+
+    if (backendOk) {
+      alert('Booking berhasil disimpan! Silakan lanjutkan ke WhatsApp untuk konfirmasi jadwal.');
+    } else {
+      alert('Sistem booking sedang kendala, tapi data tetap diarahkan ke WhatsApp agar tidak hilang.');
+    }
 
     const waUrl = `https://wa.me/6283195585892?text=${textMessage}`;
     window.open(waUrl, '_blank');

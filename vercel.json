@@ -1,0 +1,15 @@
+{
+  "$schema": "https://vercel.com/schema/vercel.json",
+  "outputDirectory": "public",
+  "functions": {
+    "api/*.js": {
+      "maxDuration": 25
+    },
+    "api/booking/*.js": {
+      "maxDuration": 25
+    },
+    "api/booking/*/*.js": {
+      "maxDuration": 25
+    }
+  }
+}

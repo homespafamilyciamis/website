@@ -1,9 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
+
+const store = require('./bookingStore');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -14,287 +15,345 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Data storage file
-const bookingsFile = path.join(__dirname, 'bookings.json');
-
-// Initialize bookings file if not exists
-if (!fs.existsSync(bookingsFile)) {
-    fs.writeFileSync(bookingsFile, JSON.stringify([], null, 2));
+// Kunci admin sederhana: jika ADMIN_KEY diisi, endpoint admin wajib kirim header x-admin-key.
+function requireAdmin(req, res, next) {
+  const configured = (process.env.ADMIN_KEY || '').trim();
+  if (!configured) return next();
+  const given = String(req.headers['x-admin-key'] || req.query.adminKey || req.body?.adminKey || '');
+  if (given !== configured) {
+    return res.status(401).json({ success: false, message: 'Unauthorized: ADMIN_KEY salah.' });
+  }
+  return next();
 }
 
-// Helper functions
-function loadBookings() {
-    try {
-        const data = fs.readFileSync(bookingsFile, 'utf8');
-        return JSON.parse(data);
-    } catch (error) {
-        console.error('Error reading bookings:', error);
-        return [];
-    }
+// Validasi bisnis: tanggal WIB tidak boleh lampau, jam 08.00–21.00.
+function isPastDateWIB(tanggal) {
+  const today = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit'
+  }).format(new Date());
+  return String(tanggal) < today;
 }
 
-function saveBookings(bookings) {
-    try {
-        fs.writeFileSync(bookingsFile, JSON.stringify(bookings, null, 2));
-        return true;
-    } catch (error) {
-        console.error('Error saving bookings:', error);
-        return false;
-    }
-}
-
-function generateBookingId() {
-    return 'BK' + Date.now() + Math.random().toString(36).substr(2, 9);
+function isOutsideHours(jam) {
+  const m = String(jam || '').match(/^(\d{1,2}):(\d{2})/);
+  if (!m) return true;
+  const mins = parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+  return mins < 8 * 60 || mins > 21 * 60;
 }
 
 function formatDate(dateString) {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('id-ID', options);
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  return new Date(dateString).toLocaleDateString('id-ID', options);
 }
 
 // Routes
 
 // GET - Halaman utama
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// GET - Halaman admin
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+// GET - Info status server + storage
+app.get('/api/health', (req, res) => {
+  res.json({ success: true, time: new Date().toISOString(), ...store.getStorageInfo() });
+});
+
+// POST - Chat Santi lokal (proxy ke Gemini, logika sama dengan api/chat.js di Vercel)
+app.post('/api/chat', async (req, res) => {
+  let message = req.body?.message;
+  if (!message && typeof req.body === 'string') {
+    try { message = JSON.parse(req.body).message; } catch (_) {}
+  }
+  if (typeof message !== 'string' || !message.trim()) {
+    return res.status(400).json({ error: 'Pesan tidak boleh kosong' });
+  }
+  const cleanMessage = message.trim().slice(0, 4000);
+  const apiKey = (process.env.GEMINI_API_KEY || '').trim();
+  if (!apiKey) {
+    return res.status(200).json({
+      reply: 'Maaf Kak, layanan Santi sedang mengalami kendala konfigurasi. ' +
+        'Silakan coba lagi beberapa saat atau hubungi admin Home Spa Family.'
+    });
+  }
+  // Prompt Santi: duplikat dari api/chat.js agar perilaku lokal = produksi.
+  // Diambil dari file api/chat.js saat runtime tidak memungkinkan (ESM),
+  // jadi gunakan prompt ringkas yang konsisten dengan pricelist resmi.
+  const systemPrompt = [
+    'Kamu adalah "Santi", Customer Service virtual resmi Home Spa Family.',
+    'Ramah, santun, hangat, profesional. Panggil pelanggan dengan "Kak". Jawaban singkat.',
+    'Layanan: salon/studio di Jalan Otista, Perum Bumi Ciharalang Lestari, Ciharalang, Cijeungjing - Ciamis;',
+    'dan home service wilayah Ciamis. Jam 08.00-21.00 WIB setiap hari.',
+    'Harga salon: Body massage 120rb, Pijat ibu hamil 200rb/jam, Facial 100rb, Face massage+masker 100rb,',
+    'Facial+masker 150rb, Creambath 100rb, Masker rambut 85rb, Scrub 100rb, Kerokan 30rb, Cuci catok 30rb,',
+    'Gurah mata 150rb, Bekam 300rb. Paket: Manja 230rb/1,5jam, Rilex 210rb/1,5jam, Komplit 350rb/2,5jam.',
+    'Home service: Body Massage 175rb/70mnt, Paket Rilex 275rb/90mnt, Paket Komplit 375rb/150mnt.',
+    'Untuk booking arahkan ke formulir BOOKING ONLINE di website. WA admin 0831-9558-5892 hanya jika diminta.'
+  ].join('\n');
+  const models = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'];
+  let lastError = '';
+  for (const model of models) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 25000);
+    try {
+      const endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          contents: [{ role: 'user', parts: [{ text: cleanMessage }] }],
+          generationConfig: { maxOutputTokens: 700 }
+        }),
+        signal: controller.signal
+      });
+      const data = await response.json();
+      if (response.ok) {
+        const reply = (data.candidates?.[0]?.content?.parts || [])
+          .map((p) => p.text || '').join('').trim();
+        if (reply) return res.status(200).json({ reply });
+      }
+      lastError = data.error?.message || ('Gemini API error (' + response.status + ')');
+    } catch (err) {
+      lastError = err?.name === 'AbortError' ? 'Timeout ke layanan AI.' : (err?.message || 'Koneksi AI gagal.');
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+  console.error('Santi AI error (lokal):', lastError);
+  return res.status(200).json({
+    reply: 'Maaf Kak, Santi sedang mengalami kendala untuk menjawab saat ini. ' +
+      'Silakan coba kirim pertanyaan lagi beberapa saat lagi.'
+  });
 });
 
 // POST - Submit booking
-app.post('/api/booking', (req, res) => {
+app.post('/api/booking', async (req, res) => {
     try {
         const { service, price, tanggal, jam, nama, whatsapp, alamat, catatan } = req.body;
 
         // Validasi input
-        if (!service || !price || !tanggal || !jam || !nama || !whatsapp || !alamat) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Semua field wajib diisi' 
+        if (!service || price === undefined || !tanggal || !jam || !nama || !whatsapp || !alamat) {
+            return res.status(400).json({
+                success: false,
+                message: 'Semua field wajib diisi'
             });
         }
 
         // Validasi nomor WhatsApp
-        if (!/^(\+62|62|0)[0-9]{9,12}$/.test(whatsapp.replace(/\D/g, ''))) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Nomor WhatsApp tidak valid' 
+        const digits = String(whatsapp).replace(/\D/g, '');
+        if (!/^(62|0)\d{9,12}$/.test(digits)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Nomor WhatsApp tidak valid'
             });
         }
 
-        // Load existing bookings
-        const bookings = loadBookings();
+        // Validasi tanggal & jam operasional
+        if (isPastDateWIB(tanggal)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Tanggal booking tidak boleh sebelum hari ini.'
+            });
+        }
+        if (isOutsideHours(jam)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Jam layanan 08.00–21.00 WIB.'
+            });
+        }
+
+        // Cegah double-booking tanggal+jam yang masih aktif
+        const existing = await store.getAllBookings();
+        const clash = existing.find((b) =>
+            b.tanggal === tanggal && String(b.jam).slice(0, 5) === String(jam).slice(0, 5) &&
+            ['Menunggu Konfirmasi', 'Terkonfirmasi'].includes(b.status)
+        );
+        if (clash) {
+            return res.status(409).json({
+                success: false,
+                message: 'Jadwal tersebut sudah dibooking. Silakan pilih jam lain.'
+            });
+        }
 
         // Create new booking
         const newBooking = {
-            id: generateBookingId(),
-            service,
-            price,
+            id: store.generateBookingId(),
+            service: String(service).slice(0, 200),
+            price: Number(price) || 0,
             tanggal,
-            jam,
-            nama,
-            whatsapp,
-            alamat,
-            catatan: catatan || '',
+            jam: String(jam).slice(0, 5),
+            nama: String(nama).slice(0, 100),
+            whatsapp: String(whatsapp).slice(0, 20),
+            alamat: String(alamat).slice(0, 500),
+            catatan: String(catatan || '').slice(0, 500),
             status: 'Menunggu Konfirmasi',
-            createdAt: new Date().toISOString(),
-            bankDetails: {
-                bank: 'Transfer Rekening',
-                instruction: 'Silakan transfer ke rekening yang telah diberikan via WhatsApp'
-            }
+            createdAt: new Date().toISOString()
         };
 
-        // Add to bookings
-        bookings.push(newBooking);
+        const saved = await store.createBooking(newBooking);
 
-        // Save bookings
-        if (saveBookings(bookings)) {
-            // Send success response
-            res.json({ 
-                success: true, 
-                message: 'Booking berhasil disimpan',
-                booking: newBooking
-            });
+        // Send success response
+        res.json({
+            success: true,
+            message: 'Booking berhasil disimpan',
+            booking: saved
+        });
 
-            // Log booking
-            console.log(`[${new Date().toLocaleString('id-ID')}] Booking baru: ${newBooking.id} - ${newBooking.nama}`);
-        } else {
-            res.status(500).json({ 
-                success: false, 
-                message: 'Gagal menyimpan booking' 
-            });
-        }
+        // Log booking
+        console.log(`[${new Date().toLocaleString('id-ID')}] Booking baru: ${saved.id} - ${saved.nama}`);
     } catch (error) {
         console.error('Error in booking:', error);
-        res.status(500).json({ 
-            success: false, 
+        res.status(500).json({
+            success: false,
             message: 'Terjadi kesalahan pada server',
-            error: error.message 
+            error: error.message
         });
     }
 });
 
-// GET - Semua bookings
-app.get('/api/bookings', (req, res) => {
+// GET - Semua bookings (admin)
+app.get('/api/bookings', requireAdmin, async (req, res) => {
     try {
-        const bookings = loadBookings();
-        res.json({ 
-            success: true, 
+        const bookings = await store.getAllBookings();
+        res.json({
+            success: true,
             data: bookings,
-            total: bookings.length 
+            total: bookings.length,
+            ...store.getStorageInfo()
         });
     } catch (error) {
-        res.status(500).json({ 
-            success: false, 
-            message: 'Gagal mengambil data bookings' 
+        res.status(500).json({
+            success: false,
+            message: 'Gagal mengambil data bookings'
         });
     }
 });
 
-// GET - Booking detail by ID
-app.get('/api/booking/:id', (req, res) => {
+// GET - Booking detail by ID (admin)
+app.get('/api/booking/:id', requireAdmin, async (req, res) => {
     try {
-        const bookings = loadBookings();
-        const booking = bookings.find(b => b.id === req.params.id);
+        const booking = await store.getBookingById(req.params.id);
 
         if (!booking) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'Booking tidak ditemukan' 
+            return res.status(404).json({
+                success: false,
+                message: 'Booking tidak ditemukan'
             });
         }
 
-        res.json({ 
-            success: true, 
-            data: booking 
+        res.json({
+            success: true,
+            data: booking
         });
     } catch (error) {
-        res.status(500).json({ 
-            success: false, 
-            message: 'Gagal mengambil data booking' 
+        res.status(500).json({
+            success: false,
+            message: 'Gagal mengambil data booking'
         });
     }
 });
 
-// PUT - Update booking status
-app.put('/api/booking/:id/status', (req, res) => {
+// PUT - Update booking status (admin)
+app.put('/api/booking/:id/status', requireAdmin, async (req, res) => {
     try {
         const { status } = req.body;
-        const validStatuses = ['Menunggu Konfirmasi', 'Terkonfirmasi', 'Dalam Proses', 'Selesai', 'Dibatalkan'];
+        const validStatuses = ['Menunggu Konfirmasi', 'Terkonfirmasi', 'Selesai', 'Dibatalkan'];
 
         if (!validStatuses.includes(status)) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Status tidak valid' 
+            return res.status(400).json({
+                success: false,
+                message: 'Status tidak valid'
             });
         }
 
-        const bookings = loadBookings();
-        const bookingIndex = bookings.findIndex(b => b.id === req.params.id);
+        const updated = await store.updateBookingStatus(req.params.id, status);
 
-        if (bookingIndex === -1) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'Booking tidak ditemukan' 
+        if (!updated) {
+            return res.status(404).json({
+                success: false,
+                message: 'Booking tidak ditemukan'
             });
         }
 
-        bookings[bookingIndex].status = status;
-        bookings[bookingIndex].updatedAt = new Date().toISOString();
-
-        if (saveBookings(bookings)) {
-            res.json({ 
-                success: true, 
-                message: 'Status booking berhasil diperbarui',
-                booking: bookings[bookingIndex]
-            });
-        } else {
-            res.status(500).json({ 
-                success: false, 
-                message: 'Gagal memperbarui status booking' 
-            });
-        }
+        res.json({
+            success: true,
+            message: 'Status booking berhasil diperbarui',
+            booking: updated
+        });
     } catch (error) {
-        res.status(500).json({ 
-            success: false, 
-            message: 'Terjadi kesalahan pada server' 
+        res.status(500).json({
+            success: false,
+            message: 'Terjadi kesalahan pada server'
         });
     }
 });
 
-// DELETE - Cancel booking
-app.delete('/api/booking/:id', (req, res) => {
+// DELETE - Cancel booking (admin)
+app.delete('/api/booking/:id', requireAdmin, async (req, res) => {
     try {
-        const bookings = loadBookings();
-        const bookingIndex = bookings.findIndex(b => b.id === req.params.id);
+        const removed = await store.deleteBooking(req.params.id);
 
-        if (bookingIndex === -1) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'Booking tidak ditemukan' 
+        if (!removed) {
+            return res.status(404).json({
+                success: false,
+                message: 'Booking tidak ditemukan'
             });
         }
 
-        const deletedBooking = bookings.splice(bookingIndex, 1);
-
-        if (saveBookings(bookings)) {
-            res.json({ 
-                success: true, 
-                message: 'Booking berhasil dibatalkan',
-                booking: deletedBooking[0]
-            });
-        } else {
-            res.status(500).json({ 
-                success: false, 
-                message: 'Gagal membatalkan booking' 
-            });
-        }
+        res.json({
+            success: true,
+            message: 'Booking berhasil dibatalkan',
+            booking: removed
+        });
     } catch (error) {
-        res.status(500).json({ 
-            success: false, 
-            message: 'Terjadi kesalahan pada server' 
+        res.status(500).json({
+            success: false,
+            message: 'Terjadi kesalahan pada server'
         });
     }
 });
 
-// GET - Booking statistics
-app.get('/api/stats', (req, res) => {
+// GET - Booking statistics (admin)
+app.get('/api/stats', requireAdmin, async (req, res) => {
     try {
-        const bookings = loadBookings();
-        
-        const stats = {
-            total: bookings.length,
-            pending: bookings.filter(b => b.status === 'Menunggu Konfirmasi').length,
-            confirmed: bookings.filter(b => b.status === 'Terkonfirmasi').length,
-            completed: bookings.filter(b => b.status === 'Selesai').length,
-            cancelled: bookings.filter(b => b.status === 'Dibatalkan').length,
-            totalRevenue: bookings
-                .filter(b => b.status === 'Selesai')
-                .reduce((sum, b) => sum + b.price, 0)
-        };
+        const stats = await store.getStats();
 
-        res.json({ 
-            success: true, 
-            data: stats 
+        res.json({
+            success: true,
+            data: stats,
+            ...store.getStorageInfo()
         });
     } catch (error) {
-        res.status(500).json({ 
-            success: false, 
-            message: 'Gagal mengambil statistik' 
+        res.status(500).json({
+            success: false,
+            message: 'Gagal mengambil statistik'
         });
     }
 });
 
 // Error handling
 app.use((req, res) => {
-    res.status(404).json({ 
-        success: false, 
-        message: 'Endpoint tidak ditemukan' 
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({
+      success: false,
+      message: 'Endpoint tidak ditemukan'
     });
+  }
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start server
-app.listen(PORT, () => {
+if (require.main === module) {
+  app.listen(PORT, () => {
     console.log(`Server Home Spa Family berjalan di http://localhost:${PORT}`);
     console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+    console.log('Storage:', store.getStorageInfo());
+  });
+}
 
 module.exports = app;

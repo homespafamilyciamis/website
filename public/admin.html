@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Home Spa Family</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,Helvetica,sans-serif;background:#f7f0df;color:#2f291f;padding:20px}
+  .wrap{max-width:1100px;margin:auto}
+  h1{font-family:Georgia,serif;color:#4b3b25;margin-bottom:4px}
+  .sub{color:#766b5b;margin-bottom:16px;font-size:14px}
+  .card{background:#fffdf7;border:1px solid #e5d6b8;border-radius:12px;padding:16px;margin-bottom:16px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  input,select{padding:10px 12px;border:1px solid #d8c9a6;border-radius:8px;font:inherit;background:#fff}
+  button{padding:10px 16px;border:none;border-radius:8px;font:inherit;font-weight:bold;cursor:pointer}
+  .btn{background:linear-gradient(135deg,#b4944e,#d0b56b);color:#fff}
+  .btn-ghost{background:#efe5cc;color:#4b3b25}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .stat{background:#f7f0df;border:1px solid #e5d6b8;border-radius:10px;padding:12px;text-align:center}
+  .stat b{display:block;font-size:22px;color:#4b3b25}
+  .stat span{font-size:12px;color:#766b5b}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:10px;border-bottom:1px solid #eee2c8;text-align:left;vertical-align:top}
+  th{background:#f7f0df;font-size:12px}
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:bold}
+  .st-Menunggu{background:#fff3cd;color:#856404}
+  .st-Terkonfirmasi{background:#d1ecf1;color:#0c5460}
+  .st-Selesai{background:#d4edda;color:#155724}
+  .st-Dibatalkan{background:#f8d7da;color:#721c24}
+  .actions{display:flex;gap:6px;flex-wrap:wrap}
+  .actions button{padding:6px 10px;font-size:12px}
+  .danger{background:#dc3545;color:#fff}
+  .ok{background:#28a745;color:#fff}
+  .warn{background:#ffc107;color:#333}
+  .muted{color:#766b5b;font-size:13px}
+  #loginBox{max-width:420px;margin:60px auto}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="loginBox">
+    <h1>Admin</h1>
+    <p class="sub">Masuk dengan ADMIN_KEY. Key hanya disimpan di browser ini.</p>
+    <div class="row">
+      <input type="password" id="adminKey" placeholder="ADMIN_KEY" style="flex:1;min-width:200px">
+      <button class="btn" onclick="login()">Masuk</button>
+    </div>
+    <p class="muted" id="loginMsg" style="margin-top:10px"></p>
+    <p class="muted" style="margin-top:8px">Jika server belum mengatur ADMIN_KEY, kosongkan lalu klik Masuk.</p>
+    <p style="margin-top:12px"><a href="/">Kembali ke website</a></p>
+  </div>
+  <div id="panel" class="hidden">
+    <h1>Dashboard Booking</h1>
+    <p class="sub" id="storageInfo">Memuat...</p>
+    <div class="card"><div class="stats" id="statsBox"></div></div>
+    <div class="card">
+      <div class="row">
+        <input id="q" placeholder="Cari nama / layanan / ID..." style="flex:1;min-width:180px" oninput="render()">
+        <select id="fStatus" onchange="render()">
+          <option value="">Semua status</option>
+          <option>Menunggu Konfirmasi</option>
+          <option>Terkonfirmasi</option>
+          <option>Selesai</option>
+          <option>Dibatalkan</option>
+        </select>
+        <button class="btn" onclick="load()">Muat ulang</button>
+        <button class="btn-ghost" onclick="exportCSV()">Export CSV</button>
+        <button class="btn-ghost" onclick="logout()">Keluar</button>
+      </div>
+    </div>
+    <div class="card" style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Tanggal/Jam</th><th>Pelanggan</th><th>Layanan</th><th>Status</th><th>Aksi</th></tr></thead>
+        <tbody id="rows"><tr><td colspan="5" class="muted">Memuat data...</td></tr></tbody>
+      </table>
+    </div>
+    <p><a href="/">Kembali ke website</a></p>
+  </div>
+</div>
+<script>
+let BOOKINGS = [];
+const key = () => localStorage.getItem('hsf_admin_key') || '';
+const headers = () => {
+  const h = { 'Content-Type': 'application/json' };
+  if (key()) h['x-admin-key'] = key();
+  return h;
+};
+const rupiah = (n) => 'Rp ' + (Number(n) || 0).toLocaleString('id-ID');
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+async function login() {
+  const v = document.getElementById('adminKey').value.trim();
+  localStorage.setItem('hsf_admin_key', v);
+  document.getElementById('loginMsg').textContent = 'Mencoba masuk...';
+  const ok = await load(true);
+  if (!ok) document.getElementById('loginMsg').textContent = 'Gagal: ADMIN_KEY salah atau server tidak bisa dihubungi.';
+}
+function logout() { localStorage.removeItem('hsf_admin_key'); location.reload(); }
+
+async function load(silent) {
+  try {
+    const [bRes, sRes] = await Promise.all([
+      fetch('/api/bookings', { headers: headers() }),
+      fetch('/api/stats', { headers: headers() })
+    ]);
+    if (bRes.status === 401 || sRes.status === 401) {
+      if (!silent) alert('ADMIN_KEY salah.');
+      return false;
+    }
+    const b = await bRes.json();
+    const s = await sRes.json();
+    if (!b.success) throw new Error(b.message || 'Gagal memuat booking');
+    BOOKINGS = b.data || [];
+    document.getElementById('storageInfo').textContent =
+      'Storage: ' + (b.storage || s.storage || '-') + ' | Total: ' + BOOKINGS.length + ' booking';
+    const d = s.data || {};
+    document.getElementById('statsBox').innerHTML =
+      stat(d.total, 'Total') + stat(d.pending, 'Menunggu') +
+      stat(d.confirmed, 'Terkonfirmasi') + stat(d.completed, 'Selesai') +
+      stat(rupiah(d.totalRevenue), 'Revenue (Selesai)');
+    document.getElementById('loginBox').classList.add('hidden');
+    document.getElementById('panel').classList.remove('hidden');
+    render();
+    return true;
+  } catch (e) {
+    console.error(e);
+    if (!silent) alert('Gagal memuat: ' + e.message);
+    return false;
+  }
+}
+function stat(v, l) {
+  return '<div class="stat"><b>' + esc(v ?? '-') + '</b><span>' + esc(l) + '</span></div>';
+}
+function render() {
+  const q = (document.getElementById('q').value || '').toLowerCase();
+  const f = document.getElementById('fStatus').value;
+  const rows = BOOKINGS.filter((b) => {
+    if (f && b.status !== f) return false;
+    if (!q) return true;
+    return [b.id, b.nama, b.service, b.whatsapp, b.alamat].join(' ').toLowerCase().includes(q);
+  });
+  const tb = document.getElementById('rows');
+  if (!rows.length) { tb.innerHTML = '<tr><td colspan="5" class="muted">Tidak ada data.</td></tr>'; return; }
+  tb.innerHTML = rows.map((b) => {
+    const cls = 'st-' + String(b.status || '').split(' ')[0];
+    return '<tr>' +
+      '<td><b>' + esc(b.tanggal) + '</b><br>' + esc(b.jam) + '<br><span class="muted">' + esc(b.id) + '</span></td>' +
+      '<td><b>' + esc(b.nama) + '</b><br>' + esc(b.whatsapp) + '<br><span class="muted">' + esc(b.alamat) + '</span>' +
+      (b.catatan ? '<br><span class="muted">' + esc(b.catatan) + '</span>' : '') + '</td>' +
+      '<td>' + esc(b.service) + '<br><b>' + rupiah(b.price) + '</b></td>' +
+      '<td><span class="badge ' + cls + '">' + esc(b.status) + '</span></td>' +
+      '<td><div class="actions">' +
+        '<button class="ok" onclick="setStatus(\'' + esc(b.id) + '\',\'Terkonfirmasi\')">Konfirmasi</button>' +
+        '<button class="warn" onclick="setStatus(\'' + esc(b.id) + '\',\'Selesai\')">Selesai</button>' +
+        '<button class="warn" onclick="setStatus(\'' + esc(b.id) + '\',\'Dibatalkan\')">Batal</button>' +
+        '<button class="danger" onclick="removeBooking(\'' + esc(b.id) + '\')">Hapus</button>' +
+      '</div></td></tr>';
+  }).join('');
+}
+async function setStatus(id, status) {
+  if (!confirm('Ubah status ' + id + ' menjadi "' + status + '"?')) return;
+  const res = await fetch('/api/booking/' + encodeURIComponent(id) + '/status', {
+    method: 'PUT', headers: headers(), body: JSON.stringify({ status })
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) return alert('Gagal: ' + (data.message || res.status));
+  load(true);
+}
+async function removeBooking(id) {
+  if (!confirm('Hapus booking ' + id + ' permanen?')) return;
+  const res = await fetch('/api/booking/' + encodeURIComponent(id), {
+    method: 'DELETE', headers: headers()
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.success) return alert('Gagal: ' + (data.message || res.status));
+  load(true);
+}
+function exportCSV() {
+  const head = ['id','tanggal','jam','nama','whatsapp','alamat','service','price','catatan','status','createdAt'];
+  const lines = [head.join(';')].concat(BOOKINGS.map((b) =>
+    head.map((k) => '"' + String(b[k] ?? '').replace(/"/g, '""') + '"').join(';')
+  ));
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'bookings-' + new Date().toISOString().slice(0, 10) + '.csv';
+  a.click();
+}
+(function init() {
+  if (localStorage.getItem('hsf_admin_key') !== null) {
+    document.getElementById('adminKey').value = key();
+    load(true);
+  }
+})();
+</script>
+</body>
+</html>

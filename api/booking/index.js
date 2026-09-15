@@ -68,6 +68,16 @@ module.exports = async function handler(req, res) {
     };
 
     const saved = await store.createBooking(booking);
+
+    // Notifikasi otomatis ke grup WA admin (gagal WA tidak menggagalkan booking)
+    try {
+      const waGroup = require('../../waGroup');
+      const notif = await waGroup.notifyGroupNewBooking(saved);
+      console.log('[booking] notifikasi grup WA:', notif.ok ? 'OK' : ('GAGAL ' + notif.reason));
+    } catch (e) {
+      console.error('[booking] notifikasi grup WA error:', e && e.message);
+    }
+
     return res.status(201).json({ success: true, message: 'Booking berhasil disimpan', booking: saved });
   } catch (err) {
     console.error('POST /api/booking error:', err);

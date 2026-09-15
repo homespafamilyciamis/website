@@ -12,6 +12,7 @@
 // ============================================================
 const { generateEvaReply, FALLBACK_REPLY } = require('../eva');
 const waStore = require('../waChatStore');
+const waGroup = require('../waGroup');
 
 const FONNTE_SEND_URL = 'https://api.fonnte.com/send';
 
@@ -105,11 +106,32 @@ module.exports = async function handler(req, res) {
   const inboxid = body.inboxid || null;
 
   let message = String(body.message || body.text || '').trim();
+  const mediaUrl = String(body.url || body.media || '').trim();
 
   // ---- Guard dasar: abaikan hal-hal yang tidak perlu dibalas ----
   if (!sender || !/^\d{8,20}$/.test(sender)) return ack();
   if (member) return ack();                       // pesan grup -> abaikan
   if (device && sender === device) return ack();  // pesan sendiri/echo -> abaikan
+
+  // ---- Media (foto bukti transfer, dll.) -> teruskan ke grup admin ----
+  if (mediaUrl) {
+    const caption = message.slice(0, 500);
+    try {
+      const g = await waGroup.forwardMedia({ sender, name, caption, url: mediaUrl });
+      console.log(`[wa-webhook] media ${maskNumber(sender)} -> grup: ${g.ok ? 'OK' : g.reason}`);
+    } catch (_) {}
+    try {
+      const reply = 'Terima kasih Kak! Foto sudah kami terima dan langsung diteruskan ' +
+        'ke admin untuk diverifikasi 🙏 Mohon ditunggu ya.';
+      await waStore.saveMessage(sender, 'customer', caption || '[foto/media]');
+      await waStore.saveMessage(sender, 'eva', reply);
+      await sendFonnte(sender, reply, inboxid);
+    } catch (err) {
+      console.error('[wa-webhook] media reply gagal:', err && err.message);
+    }
+    return ack();
+  }
+
   if (!message && body.location) {
     message = 'Pelanggan mengirim titik lokasi (koordinat maps).';
   }
@@ -132,6 +154,22 @@ module.exports = async function handler(req, res) {
       `[wa-webhook] chat ${maskNumber(sender)}${name ? ' (' + name.slice(0, 20) + ')' : ''} ` +
       `len=${message.length}`
     );
+
+    // ---- Pesan booking dari form website -> template closing (tanpa AI) ----
+    // Notifikasi ke grup sudah dikirim otomatis oleh POST /api/booking saat
+    // booking disimpan, jadi di sini cukup balas konfirmasi + pembayaran.
+    const booking = waGroup.parseBookingMessage(message);
+    if (booking) {
+      const closingReply = waGroup.buildBookingCustomerReply(booking);
+      try {
+        await waStore.saveMessage(sender, 'eva', closingReply);
+      } catch (_) {}
+      const sentBooking = await sendFonnte(sender, closingReply, inboxid);
+      console.log(
+        `[wa-webhook] booking ${maskNumber(sender)} -> closing: ${sentBooking.ok ? 'OK' : sentBooking.reason}`
+      );
+      return ack();
+    }
 
     // Jeda singkat: kalau pelanggan mengirim pesan lagi dalam jeda ini,
     // serahkan jawaban ke invokasi terbaru (digabung, tidak menjawab 2x).

@@ -159,6 +159,13 @@ CATATAN KHUSUS WHATSAPP
 - Kamu membalas lewat chat WhatsApp. Gunakan teks polos tanpa markdown (tanpa tanda **bold**, heading, atau tabel) karena WhatsApp tidak menampilkan format tersebut.
 - Jawaban tetap singkat, padat, dan mudah dibaca di layar HP.
 - Jika pelanggan ingin booking, arahkan ke link booking online: https://www.homespafamily.my.id/#booking
+- Jika pelanggan SUDAH mengirim detail booking dari form website atau menyebut sudah booking: JANGAN minta mengisi form lagi atau pindah chat. Tugasmu hanya memastikan detail benar, lalu jelaskan bahwa pesan konfirmasi + info pembayaran otomatis dikirim sistem ke chat ini.
+
+PEMBAYARAN (jawab HANYA dengan data ini, jangan mengarang)
+- Layanan panggilan (home service): bayar penuh saat booking atau DP minimal Rp50.000, sisanya ke terapis saat tiba.
+- Layanan di salon/studio: boleh bayar di tempat, atau DP untuk mengunci jadwal.
+- Transfer: BCA 203-123-5415 a.n. Lilis Riawaningsih, atau DANA 0831-9558-5892 a.n. Septian Gilang.
+- Bukti transfer dikirim pelanggan ke chat ini, admin verifikasi, jadwal langsung dikunci.
 `;
 
 // Daftar model sama persis dengan api/chat.js (fallback berurutan)

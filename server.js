@@ -93,7 +93,10 @@ app.post('/api/chat', async (req, res) => {
     'Facial+masker 150rb, Creambath 100rb, Masker rambut 85rb, Scrub 100rb, Kerokan 30rb, Cuci catok 30rb,',
     'Gurah mata 150rb, Bekam 300rb. Paket: Manja 230rb/1,5jam, Rilex 210rb/1,5jam, Komplit 350rb/2,5jam.',
     'Home service: Body Massage 175rb/70mnt, Paket Rilex 275rb/90mnt, Paket Komplit 375rb/150mnt.',
-    'Untuk booking arahkan ke formulir BOOKING ONLINE di website. WA admin 0851-2624-6175 hanya jika diminta.'
+    'Untuk booking arahkan ke formulir BOOKING ONLINE di website. WA admin 0851-2624-6175 hanya jika diminta.',
+    'Pembayaran: layanan panggilan = bayar penuh saat booking atau DP min Rp50.000; layanan di salon = boleh bayar di tempat / DP kunci jadwal.',
+    'Rekening: BCA 203-123-5415 a.n. Lilis Riawaningsih, DANA 0831-9558-5892 a.n. Septian Gilang. Bukti transfer via WhatsApp, admin verifikasi.',
+    'Jika pelanggan sudah mengisi form booking: katakan booking diterima sistem, konfirmasi + pembayaran otomatis dikirim ke WhatsApp-nya. Jangan minta isi form lagi.'
   ].join('\n');
   const models = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'];
   let lastError = '';

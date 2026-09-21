@@ -36,6 +36,18 @@
   .warn{background:#ffc107;color:#333}
   .muted{color:#766b5b;font-size:13px}
   #loginBox{max-width:420px;margin:60px auto}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .tabs button{padding:8px 14px;border-radius:20px;background:#efe5cc;color:#4b3b25;font-weight:bold;font-size:13px}
+  .tabs button.active{background:linear-gradient(135deg,#b4944e,#d0b56b);color:#fff}
+  .tab-panel{display:block}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
+  h3{font-family:Georgia,serif;color:#4b3b25;font-weight:normal}
+  textarea{width:100%;min-height:96px;padding:10px 12px;border:1px solid #d8c9a6;border-radius:8px;font:inherit;background:#fff}
+  .pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:bold;background:#efe5cc;color:#4b3b25}
+  .tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:bold;color:#fff;background:#8a7c64}
+  .kecil{font-size:12px;line-height:1.5}
+  .opsi{border:1px solid #e5d6b8;border-radius:10px;padding:12px;margin-bottom:10px;background:#fffdf7}
+  .opsi b{color:#4b3b25}
   .hidden{display:none}
 </style>
 </head>
@@ -53,9 +65,29 @@
     <p style="margin-top:12px"><a href="/">Kembali ke website</a></p>
   </div>
   <div id="panel" class="hidden">
-    <h1>Dashboard Booking</h1>
+    <h1>Dashboard Admin</h1>
     <p class="sub" id="storageInfo">Memuat...</p>
-    <div class="card"><div class="stats" id="statsBox"></div></div>
+    <div class="tabs" id="tabsNav">
+      <button data-tab="ringkasan" class="active" onclick="switchTab('ringkasan')">Ringkasan</button>
+      <button data-tab="booking" onclick="switchTab('booking')">Booking</button>
+      <button data-tab="pelanggan" onclick="switchTab('pelanggan')">Pelanggan</button>
+      <button data-tab="followup" onclick="switchTab('followup')">Follow-up</button>
+      <button data-tab="broadcast" onclick="switchTab('broadcast')">Broadcast</button>
+      <button data-tab="laporan" onclick="switchTab('laporan')">Laporan AI</button>
+    </div>
+
+    <!-- ============ TAB: RINGKASAN ============ -->
+    <div id="tab-ringkasan" class="tab-panel">
+      <div class="card"><div class="stats" id="statsBox"></div></div>
+      <div class="card">
+        <h3>Otomasi WhatsApp (Eva)</h3>
+        <div class="stats" id="otomasiBox"><span class="muted">Memuat...</span></div>
+        <p class="muted kecil" id="otomasiKet" style="margin-top:10px"></p>
+      </div>
+    </div>
+
+    <!-- ============ TAB: BOOKING ============ -->
+    <div id="tab-booking" class="tab-panel hidden">
     <div class="card">
       <div class="row">
         <input id="q" placeholder="Cari nama / layanan / ID..." style="flex:1;min-width:180px" oninput="render()">
@@ -77,6 +109,125 @@
         <tbody id="rows"><tr><td colspan="5" class="muted">Memuat data...</td></tr></tbody>
       </table>
     </div>
+    </div>
+
+    <!-- ============ TAB: PELANGGAN ============ -->
+    <div id="tab-pelanggan" class="tab-panel hidden">
+      <div class="card"><div class="stats" id="pelangganStats"></div></div>
+      <div class="card">
+        <div class="row">
+          <input id="qPelanggan" placeholder="Cari nama / nomor / layanan..." style="flex:1;min-width:180px" oninput="muatPelanggan()">
+          <select id="fSegmen" onchange="muatPelanggan()">
+            <option value="">Semua segmen</option>
+            <option value="baru">Baru</option>
+            <option value="hangat">Hangat (chat, belum booking)</option>
+            <option value="aktif">Aktif</option>
+            <option value="pasif">Pasif</option>
+          </select>
+          <button class="btn" onclick="muatPelanggan()">Muat ulang</button>
+        </div>
+        <p class="muted kecil" style="margin-top:8px">Data terisi otomatis dari booking dan chat WhatsApp yang masuk.</p>
+      </div>
+      <div class="card" style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Pelanggan</th><th>Segmen</th><th>Booking</th><th>Belanja</th><th>Terakhir</th><th>Aksi</th></tr></thead>
+          <tbody id="rowsPelanggan"><tr><td colspan="6" class="muted">Memuat...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ TAB: FOLLOW-UP ============ -->
+    <div id="tab-followup" class="tab-panel hidden">
+      <div class="card">
+        <h3>Aturan otomasi</h3>
+        <p class="muted kecil">Follow-up &amp; pengingat aman sudah aktif. Broadcast/promosi tetap mati sampai Anda nyalakan sendiri.</p>
+        <div id="rowsAturan" style="margin-top:10px"><span class="muted">Memuat...</span></div>
+      </div>
+      <div class="card">
+        <div class="row">
+          <button class="btn-ghost" onclick="pratinjauFollowup()">Pratinjau (tanpa kirim)</button>
+          <button class="btn" onclick="jalankanFollowup()">Susun &amp; kirim sekarang</button>
+          <button class="btn-ghost" onclick="kirimAntrean()">Kirim antrean menunggu</button>
+          <button class="btn-ghost" onclick="muatFollowup()">Muat ulang</button>
+        </div>
+        <div class="stats" id="antreanStats" style="margin-top:12px"></div>
+        <p class="muted kecil" id="pratinjauBox" style="margin-top:10px"></p>
+      </div>
+      <div class="card" style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Waktu</th><th>Pelanggan</th><th>Jenis</th><th>Pesan</th><th>Status</th></tr></thead>
+          <tbody id="rowsAntrean"><tr><td colspan="5" class="muted">Memuat...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ TAB: BROADCAST ============ -->
+    <div id="tab-broadcast" class="tab-panel hidden">
+      <div class="card">
+        <h3>Buat broadcast baru</h3>
+        <div class="row" style="margin-bottom:8px">
+          <input id="bcNama" placeholder="Nama campaign" style="flex:1;min-width:180px">
+          <select id="bcSegmen">
+            <option value="">Semua pelanggan</option>
+            <option value="pasif">Pasif (lama tidak kembali)</option>
+            <option value="aktif">Aktif</option>
+            <option value="hangat">Hangat (chat, belum booking)</option>
+            <option value="baru">Baru</option>
+          </select>
+          <input id="bcLimit" type="number" value="40" min="1" max="200" style="width:90px" title="Maksimal target">
+        </div>
+        <textarea id="bcPesan" placeholder="Halo Kak {name}, ... (pakai {name} untuk menyapa nama pelanggan)"></textarea>
+        <div class="row" style="margin-top:10px">
+          <button class="btn-ghost" onclick="pratinjauBroadcast()">Pratinjau &amp; hitung target</button>
+          <button class="btn" onclick="buatBroadcast()">Simpan sebagai draft</button>
+        </div>
+        <p class="muted kecil" id="bcInfo" style="margin-top:10px"></p>
+      </div>
+      <div class="card" style="overflow-x:auto">
+        <table>
+          <thead><tr><th>#</th><th>Campaign</th><th>Target</th><th>Status</th><th>Aksi</th></tr></thead>
+          <tbody id="rowsBroadcast"><tr><td colspan="5" class="muted">Memuat...</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Antrean &amp; riwayat pengiriman</h3>
+        <div class="row" style="margin-bottom:8px">
+          <select id="fOutbox" onchange="muatBroadcast()">
+            <option value="">Semua status</option>
+            <option value="queued">Menunggu</option>
+            <option value="sent">Terkirim</option>
+            <option value="failed">Gagal</option>
+            <option value="skipped">Dilewati</option>
+          </select>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>Waktu</th><th>Nomor</th><th>Jenis</th><th>Pesan</th><th>Status</th></tr></thead>
+            <tbody id="rowsOutbox"><tr><td colspan="5" class="muted">Memuat...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ TAB: LAPORAN AI ============ -->
+    <div id="tab-laporan" class="tab-panel hidden">
+      <div class="card">
+        <div class="row">
+          <button class="btn" onclick="buatLaporan()">Buat laporan sekarang</button>
+          <button class="btn-ghost" onclick="muatLaporan()">Muat ulang</button>
+        </div>
+        <p class="muted kecil" style="margin-top:8px">Analisis memakai angka nyata dari database: omset, booking, layanan, jam kosong, pelanggan, dan aktivitas chat.</p>
+        <p class="muted" id="laporanInfo" style="margin-top:8px"></p>
+      </div>
+      <div class="card" id="laporanDetail"><p class="muted">Belum ada laporan yang dipilih.</p></div>
+      <div class="card" style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Waktu</th><th>Periode</th><th>Ringkasan</th><th>Temuan / Opsi</th><th>Aksi</th></tr></thead>
+          <tbody id="rowsLaporan"><tr><td colspan="5" class="muted">Memuat...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
     <p><a href="/">Kembali ke website</a></p>
   </div>
 </div>
@@ -124,6 +275,7 @@ async function load(silent) {
     document.getElementById('loginBox').classList.add('hidden');
     document.getElementById('panel').classList.remove('hidden');
     render();
+    muatOtomasiRingkas();
     return true;
   } catch (e) {
     console.error(e);
@@ -189,6 +341,491 @@ function exportCSV() {
   a.download = 'bookings-' + new Date().toISOString().slice(0, 10) + '.csv';
   a.click();
 }
+// ============================================================
+// Bagian otomasi (pelanggan, follow-up, broadcast, laporan AI)
+// ============================================================
+let TAB_AKTIF = 'ringkasan';
+
+const WARNA_STATUS = {
+  queued: '#8a7c64', sent: '#28a745', failed: '#dc3545', skipped: '#ffc107',
+  draft: '#8a7c64', menunggu_approval: '#ffc107', disetujui: '#17a2b8',
+  terkirim: '#28a745', dibatalkan: '#dc3545'
+};
+const WARNA_SEGMEN = { baru: '#17a2b8', hangat: '#ffc107', aktif: '#28a745', pasif: '#8a7c64' };
+
+async function api(path, options) {
+  const opt = Object.assign({ method: 'GET' }, options || {});
+  opt.headers = Object.assign(headers(), opt.headers || {});
+  const res = await fetch(path, opt);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.success === false) {
+    throw new Error(data.message || ('Gagal memuat (' + res.status + ')'));
+  }
+  return data;
+}
+function pesan(id, teks, warna) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.textContent = teks || '';
+    el.style.color = warna || '';
+  }
+}
+function tag(teks, warna) {
+  return '<span class="tag" style="background:' + (warna || '#8a7c64') + '">' + esc(teks || '-') + '</span>';
+}
+function tagStatus(s) {
+  return tag(s, WARNA_STATUS[s] || '#8a7c64');
+}
+function waktu(iso) {
+  if (!iso) return '-';
+  try {
+    return new Date(iso).toLocaleString('id-ID', {
+      timeZone: 'Asia/Jakarta', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+    });
+  } catch (_) {
+    return String(iso).slice(0, 16);
+  }
+}
+function potong(teks, n) {
+  const s = String(teks || '');
+  return s.length > n ? s.slice(0, n) + '…' : s;
+}
+function switchTab(nama) {
+  TAB_AKTIF = nama;
+  document.querySelectorAll('.tab-panel').forEach((el) => el.classList.add('hidden'));
+  const panel = document.getElementById('tab-' + nama);
+  if (panel) panel.classList.remove('hidden');
+  document.querySelectorAll('#tabsNav button').forEach((b) => {
+    b.classList.toggle('active', b.getAttribute('data-tab') === nama);
+  });
+  if (nama === 'ringkasan') muatOtomasiRingkas();
+  if (nama === 'pelanggan') muatPelanggan();
+  if (nama === 'followup') muatFollowup();
+  if (nama === 'broadcast') muatBroadcast();
+  if (nama === 'laporan') muatLaporan();
+}
+
+// ---------- Ringkasan otomasi ----------
+async function muatOtomasiRingkas() {
+  try {
+    const hasil = await Promise.all([
+      api('/api/customers?limit=1'),
+      api('/api/automation'),
+      api('/api/customers?outbox=1&limit=1')
+    ]);
+    const r = hasil[0].ringkasan || {};
+    const o = hasil[2].ringkasan || {};
+    const aktif = (hasil[1].data || []).filter((x) => x.is_on).map((x) => x.title).join(', ') || 'tidak ada';
+
+    document.getElementById('otomasiBox').innerHTML =
+      stat(r.total_pelanggan, 'Pelanggan') +
+      stat(r.bisa_dihubungi, 'Bisa dihubungi') +
+      stat(r.opt_out, 'Opt-out') +
+      stat((Number(r.pasif) || 0) + (Number(r.hangat) || 0), 'Kandidat follow-up');
+
+    pesan('otomasiKet',
+      'Antrean: ' + (o.queued || 0) + ' menunggu, ' + (o.sent || 0) + ' terkirim, ' + (o.failed || 0) + ' gagal. ' +
+      'Aturan aktif: ' + aktif + '.');
+  } catch (err) {
+    document.getElementById('otomasiBox').innerHTML = '<span class="muted">' + esc(err.message) + '</span>';
+    pesan('otomasiKet', 'Jika tabel otomasi belum ada, jalankan supabase.sql di SQL Editor Supabase.', '#dc3545');
+  }
+}
+
+// ---------- Pelanggan ----------
+async function muatPelanggan() {
+  const tb = document.getElementById('rowsPelanggan');
+  tb.innerHTML = '<tr><td colspan="6" class="muted">Memuat...</td></tr>';
+
+  try {
+    const segmen = document.getElementById('fSegmen').value;
+    const q = document.getElementById('qPelanggan').value;
+    const hasil = await api('/api/customers?limit=200&segmen=' + encodeURIComponent(segmen) + '&q=' + encodeURIComponent(q));
+    const r = hasil.ringkasan || {};
+
+    document.getElementById('pelangganStats').innerHTML =
+      stat(r.total_pelanggan, 'Total') + stat(r.baru, 'Baru') + stat(r.hangat, 'Hangat') +
+      stat(r.aktif, 'Aktif') + stat(r.pasif, 'Pasif') + stat(r.opt_out, 'Opt-out');
+
+    const rows = hasil.data || [];
+    if (!rows.length) {
+      tb.innerHTML = '<tr><td colspan="6" class="muted">Belum ada data pelanggan.</td></tr>';
+      return;
+    }
+
+    tb.innerHTML = rows.map((c) => '<tr>' +
+      '<td><b>' + esc(c.nama || '-') + '</b><br><span class="muted">' + esc(c.wa_number) + '</span>' +
+        (c.alamat ? '<br><span class="muted">' + esc(potong(c.alamat, 60)) + '</span>' : '') + '</td>' +
+      '<td>' + tag(c.segmen, WARNA_SEGMEN[c.segmen]) +
+        (c.opt_in === false ? '<br>' + tag('opt-out', '#dc3545') : '') + '</td>' +
+      '<td>' + esc(c.total_bookings || 0) + 'x<br><span class="muted">' + esc(c.last_service || '-') + '</span></td>' +
+      '<td>' + rupiah(c.total_spend) + '</td>' +
+      '<td class="kecil">Chat: ' + waktu(c.last_seen) + '<br>Follow-up: ' + waktu(c.last_contact_at) + '</td>' +
+      '<td><div class="actions">' +
+        (c.opt_in === false
+          ? '<button class="ok" onclick="ubahOptIn(\'' + esc(c.wa_number) + '\', true)">Izinkan</button>'
+          : '<button class="danger" onclick="ubahOptIn(\'' + esc(c.wa_number) + '\', false)">Berhenti</button>') +
+        '<a class="muted kecil" href="https://wa.me/' + esc(c.wa_number) + '" target="_blank" rel="noopener">Chat</a>' +
+      '</div></td></tr>').join('');
+  } catch (err) {
+    tb.innerHTML = '<tr><td colspan="6" class="muted">' + esc(err.message) + '</td></tr>';
+  }
+}
+
+async function ubahOptIn(wa, izinkan) {
+  if (!confirm((izinkan ? 'Izinkan' : 'Hentikan') + ' pengiriman otomasi ke ' + wa + '?')) return;
+  try {
+    await api('/api/customers', {
+      method: 'POST',
+      body: JSON.stringify({ aksi: izinkan ? 'optin' : 'optout', wa })
+    });
+    muatPelanggan();
+    muatOtomasiRingkas();
+  } catch (err) {
+    alert('Gagal: ' + err.message);
+  }
+}
+
+
+// ---------- Follow-up & aturan otomasi ----------
+async function muatFollowup() {
+  try {
+    const hasil = await Promise.all([
+      api('/api/automation'),
+      api('/api/customers?outbox=1&limit=80')
+    ]);
+    const aturan = hasil[0].data || [];
+    const outbox = hasil[1];
+
+    document.getElementById('rowsAturan').innerHTML = aturan.length
+      ? aturan.map((r) => {
+        const cfg = r.config || {};
+        const setelan = Object.keys(cfg).length ? JSON.stringify(cfg) : '-';
+        return '<div class="opsi"><div class="row" style="justify-content:space-between">' +
+          '<div style="flex:1;min-width:220px">' +
+            '<b>' + esc(r.title) + '</b>' +
+            '<div class="muted kecil">' + esc(r.description || '') + '</div>' +
+            '<div class="muted kecil">Setelan: ' + esc(potong(setelan, 220)) + '</div>' +
+            (r.last_run_at ? '<div class="muted kecil">Terakhir jalan: ' + waktu(r.last_run_at) + '</div>' : '') +
+          '</div>' +
+          '<label class="muted kecil"><input type="checkbox" ' + (r.is_on ? 'checked' : '') +
+            ' onchange="toggleAturan(\'' + esc(r.key) + '\', this.checked)"> Aktif</label>' +
+        '</div></div>';
+      }).join('')
+      : '<span class="muted">Belum ada aturan otomasi. Jalankan supabase.sql.</span>';
+
+    const o = outbox.ringkasan || {};
+    document.getElementById('antreanStats').innerHTML =
+      stat(o.queued, 'Menunggu') + stat(o.sent, 'Terkirim') +
+      stat(o.failed, 'Gagal') + stat(o.skipped, 'Dilewati');
+
+    const rows = outbox.data || [];
+    document.getElementById('rowsAntrean').innerHTML = rows.length
+      ? rows.map((m) => '<tr>' +
+        '<td class="kecil">' + waktu(m.created_at) + '</td>' +
+        '<td>' + esc(m.nama || '-') + '<br><span class="muted">' + esc(m.wa_number) + '</span></td>' +
+        '<td>' + esc(m.kind) + (m.template_key ? '<br><span class="muted">' + esc(m.template_key) + '</span>' : '') + '</td>' +
+        '<td class="kecil">' + esc(potong(m.message, 170)) +
+          (m.error ? '<br><span style="color:#dc3545">' + esc(potong(m.error, 100)) + '</span>' : '') + '</td>' +
+        '<td>' + tagStatus(m.status) + '</td></tr>').join('')
+      : '<tr><td colspan="5" class="muted">Antrean kosong.</td></tr>';
+  } catch (err) {
+    document.getElementById('rowsAturan').innerHTML = '<span class="muted">' + esc(err.message) + '</span>';
+    document.getElementById('rowsAntrean').innerHTML =
+      '<tr><td colspan="5" class="muted">' + esc(err.message) + '</td></tr>';
+  }
+}
+
+async function toggleAturan(key, aktif) {
+  pesan('pratinjauBox', 'Menyimpan aturan ' + key + '...');
+  try {
+    await api('/api/automation', { method: 'POST', body: JSON.stringify({ key, is_on: aktif }) });
+    pesan('pratinjauBox', 'Aturan ' + key + ' ' + (aktif ? 'diaktifkan' : 'dimatikan') + '.');
+    muatFollowup();
+  } catch (err) {
+    pesan('pratinjauBox', 'Gagal: ' + err.message, '#dc3545');
+  }
+}
+
+async function pratinjauFollowup() {
+  pesan('pratinjauBox', 'Menyusun pratinjau (tidak ada pesan yang dikirim)...');
+  try {
+    const hasil = await api('/api/customers', {
+      method: 'POST',
+      body: JSON.stringify({ aksi: 'pratinjau-followup' })
+    });
+    const d = hasil.data || {};
+    const baris = (d.pratinjau || []).map((p) => '• [' + p.jenis + '] ' + p.nomor + ' → ' + potong(p.pesan, 90));
+    pesan('pratinjauBox',
+      'Akan disusun: ' + (d.disusun || 0) + ' pesan.\n' +
+      (baris.length ? baris.join('\n') : '(belum ada target yang memenuhi aturan hari ini)') +
+      (d.errors && d.errors.length ? '\nCatatan: ' + d.errors.join(' | ') : ''));
+  } catch (err) {
+    pesan('pratinjauBox', 'Gagal: ' + err.message, '#dc3545');
+  }
+}
+
+async function jalankanFollowup() {
+  if (!confirm('Susun DAN kirim follow-up sekarang?\nPesan hanya dikirim ke pelanggan yang bersedia dihubungi.')) return;
+  pesan('pratinjauBox', 'Menjalankan otomasi...');
+  try {
+    const hasil = await api('/api/customers', {
+      method: 'POST',
+      body: JSON.stringify({ aksi: 'jalankan-followup', limitKirim: 40 })
+    });
+    const k = (hasil.data && hasil.data.dikirim) || {};
+    pesan('pratinjauBox',
+      'Selesai. Terkirim: ' + (k.dikirim || 0) + ', gagal: ' + (k.gagal || 0) +
+      ', ditunda: ' + (k.ditunda || 0) + (k.catatan ? ' — ' + k.catatan : ''));
+    muatFollowup();
+    muatOtomasiRingkas();
+  } catch (err) {
+    pesan('pratinjauBox', 'Gagal: ' + err.message, '#dc3545');
+  }
+}
+
+async function kirimAntrean() {
+  if (!confirm('Kirim semua pesan yang sedang menunggu di antrean?')) return;
+  pesan('pratinjauBox', 'Mengirim antrean...');
+  try {
+    const hasil = await api('/api/customers', {
+      method: 'POST',
+      body: JSON.stringify({ aksi: 'kirim-antrean', limit: 20 })
+    });
+    const k = hasil.data || {};
+    pesan('pratinjauBox',
+      'Terkirim: ' + (k.dikirim || 0) + ', gagal: ' + (k.gagal || 0) + ', ditunda: ' + (k.ditunda || 0));
+    muatFollowup();
+  } catch (err) {
+    pesan('pratinjauBox', 'Gagal: ' + err.message, '#dc3545');
+  }
+}
+
+// ---------- Broadcast ----------
+async function muatBroadcast() {
+  try {
+    const status = document.getElementById('fOutbox').value;
+    const hasil = await Promise.all([
+      api('/api/broadcast'),
+      api('/api/customers?outbox=1&limit=60' + (status ? '&status=' + encodeURIComponent(status) : ''))
+    ]);
+
+    const daftar = hasil[0].data || [];
+    document.getElementById('rowsBroadcast').innerHTML = daftar.length
+      ? daftar.map((c) => '<tr>' +
+        '<td>#' + esc(c.id) + '</td>' +
+        '<td><b>' + esc(c.nama) + '</b><br><span class="muted kecil">' + esc(potong(c.pesan, 140)) + '</span>' +
+          (c.sumber === 'ai' ? '<br>' + tag('dari AI', '#6f42c1') : '') + '</td>' +
+        '<td>' + esc(c.total_target || 0) + '<br><span class="muted kecil">terkirim ' + esc(c.total_sent || 0) + '</span></td>' +
+        '<td>' + tagStatus(c.status) + '</td>' +
+        '<td><div class="actions">' +
+          (c.status === 'menunggu_approval' || c.status === 'draft'
+            ? '<button class="ok" onclick="setujuiCampaign(' + esc(c.id) + ')">Setujui</button>' +
+              '<button class="warn" onclick="kirimCampaign(' + esc(c.id) + ')">Setujui &amp; kirim</button>'
+            : '') +
+          (c.status === 'disetujui' ? '<button class="btn" onclick="kirimCampaign(' + esc(c.id) + ')">Kirim</button>' : '') +
+          (c.status !== 'terkirim' && c.status !== 'dibatalkan'
+            ? '<button class="danger" onclick="batalkanCampaign(' + esc(c.id) + ')">Batalkan</button>'
+            : '') +
+        '</div></td></tr>').join('')
+      : '<tr><td colspan="5" class="muted">Belum ada campaign broadcast.</td></tr>';
+
+    const rows = hasil[1].data || [];
+    document.getElementById('rowsOutbox').innerHTML = rows.length
+      ? rows.map((m) => '<tr>' +
+        '<td class="kecil">' + waktu(m.send_at) + '</td>' +
+        '<td>' + esc(m.nama || '-') + '<br><span class="muted">' + esc(m.wa_number) + '</span></td>' +
+        '<td>' + esc(m.kind) + '</td>' +
+        '<td class="kecil">' + esc(potong(m.message, 150)) +
+          (m.error ? '<br><span style="color:#dc3545">' + esc(potong(m.error, 100)) + '</span>' : '') + '</td>' +
+        '<td>' + tagStatus(m.status) + '</td></tr>').join('')
+      : '<tr><td colspan="5" class="muted">Antrean kosong.</td></tr>';
+  } catch (err) {
+    document.getElementById('rowsBroadcast').innerHTML =
+      '<tr><td colspan="5" class="muted">' + esc(err.message) + '</td></tr>';
+  }
+}
+
+function filterBroadcast() {
+  const segmen = document.getElementById('bcSegmen').value;
+  const filter = { limit: Number(document.getElementById('bcLimit').value) || 40 };
+  if (segmen) filter.segmen = segmen;
+  return filter;
+}
+
+async function pratinjauBroadcast() {
+  pesan('bcInfo', 'Menghitung target...');
+  try {
+    const hasil = await api('/api/broadcast', {
+      method: 'POST',
+      body: JSON.stringify({
+        aksi: 'pratinjau',
+        pesan: document.getElementById('bcPesan').value,
+        filter: filterBroadcast()
+      })
+    });
+    const d = hasil.data || {};
+    pesan('bcInfo', 'Target: ' + (d.jumlah_target || 0) + ' pelanggan.\n\nContoh pesan:\n' + (d.contoh_pesan || ''));
+  } catch (err) {
+    pesan('bcInfo', 'Gagal: ' + err.message, '#dc3545');
+  }
+}
+
+async function buatBroadcast() {
+  const teks = document.getElementById('bcPesan').value.trim();
+  if (!teks) {
+    alert('Isi pesan broadcast dulu.');
+    return;
+  }
+  if (!confirm('Simpan campaign ini sebagai draft?\nCampaign tidak akan terkirim sebelum disetujui.')) return;
+
+  try {
+    const hasil = await api('/api/broadcast', {
+      method: 'POST',
+      body: JSON.stringify({
+        aksi: 'buat',
+        nama: document.getElementById('bcNama').value || 'Broadcast manual',
+        pesan: teks,
+        filter: filterBroadcast()
+      })
+    });
+    pesan('bcInfo', 'Draft #' + hasil.data.id + ' dibuat untuk ' + (hasil.jumlah_target || 0) +
+      ' target. Setujui untuk mulai mengirim.');
+    document.getElementById('bcPesan').value = '';
+    muatBroadcast();
+  } catch (err) {
+    pesan('bcInfo', 'Gagal: ' + err.message, '#dc3545');
+  }
+}
+
+async function setujuiCampaign(id) {
+  if (!confirm('Setujui campaign #' + id + '? Antrean pesan akan disiapkan.')) return;
+  try {
+    await api('/api/broadcast', { method: 'POST', body: JSON.stringify({ aksi: 'setujui', id }) });
+    muatBroadcast();
+  } catch (err) {
+    alert('Gagal: ' + err.message);
+  }
+}
+
+async function kirimCampaign(id) {
+  if (!confirm('Kirim campaign #' + id + ' sekarang?\nPesan hanya dikirim ke pelanggan yang bersedia dihubungi.')) return;
+  try {
+    const hasil = await api('/api/broadcast', {
+      method: 'POST',
+      body: JSON.stringify({ aksi: 'kirim', id, limit: 60 })
+    });
+    alert(hasil.message || 'Dikirim.');
+    muatBroadcast();
+  } catch (err) {
+    alert('Gagal: ' + err.message);
+  }
+}
+
+async function batalkanCampaign(id) {
+  if (!confirm('Batalkan campaign #' + id + '?')) return;
+  try {
+    await api('/api/broadcast', { method: 'POST', body: JSON.stringify({ aksi: 'batalkan', id }) });
+    muatBroadcast();
+  } catch (err) {
+    alert('Gagal: ' + err.message);
+  }
+}
+
+// ---------- Laporan analisis AI ----------
+let LAPORAN = [];
+
+async function muatLaporan() {
+  try {
+    const hasil = await api('/api/analytics?limit=20');
+    LAPORAN = hasil.data || [];
+
+    document.getElementById('rowsLaporan').innerHTML = LAPORAN.length
+      ? LAPORAN.map((l) => '<tr>' +
+        '<td class="kecil">' + waktu(l.created_at) + '<br><span class="muted">' + esc(l.model || '-') + '</span></td>' +
+        '<td class="kecil">' + esc(l.period_start || '-') + '<br>s/d ' + esc(l.period_end || '-') + '</td>' +
+        '<td class="kecil">' + esc(potong(l.ringkasan, 220)) + '</td>' +
+        '<td class="kecil">' + (l.temuan || []).length + ' temuan<br>' + (l.opsi || []).length + ' opsi</td>' +
+        '<td><div class="actions">' +
+          '<button class="btn-ghost" onclick="lihatLaporan(' + esc(l.id) + ')">Lihat</button>' +
+          '<button class="btn-ghost" onclick="kirimLaporanGrup(' + esc(l.id) + ')">Kirim ke grup</button>' +
+        '</div></td></tr>').join('')
+      : '<tr><td colspan="5" class="muted">Belum ada laporan. Klik "Buat laporan sekarang".</td></tr>';
+  } catch (err) {
+    document.getElementById('rowsLaporan').innerHTML =
+      '<tr><td colspan="5" class="muted">' + esc(err.message) + '</td></tr>';
+  }
+}
+
+async function buatLaporan() {
+  pesan('laporanInfo', 'Mengumpulkan data & meminta analisis AI... (sekitar 10-20 detik)');
+  try {
+    const hasil = await api('/api/analytics', { method: 'POST', body: JSON.stringify({ aksi: 'buat' }) });
+    pesan('laporanInfo', hasil.message || 'Laporan dibuat.');
+    await muatLaporan();
+    if (hasil.data && hasil.data.id) lihatLaporan(hasil.data.id);
+  } catch (err) {
+    pesan('laporanInfo', 'Gagal: ' + err.message, '#dc3545');
+  }
+}
+
+function lihatLaporan(id) {
+  const l = LAPORAN.find((x) => String(x.id) === String(id));
+  if (!l) {
+    document.getElementById('laporanDetail').innerHTML = '<p class="muted">Laporan tidak ditemukan.</p>';
+    return;
+  }
+
+  const temuan = (l.temuan || []).map((t) => '<li>' + esc(t) + '</li>').join('');
+  const opsi = (l.opsi || []).map((o, i) => '<div class="opsi">' +
+    '<b>' + (i + 1) + '. ' + esc(o.judul) + '</b>' +
+    '<div class="kecil">' + esc(o.alasan || '') + '</div>' +
+    ((o.langkah || []).length
+      ? '<ul class="kecil">' + o.langkah.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ul>'
+      : '') +
+    '<div class="kecil muted">Estimasi: ' + esc(o.dampak_estimasi || '-') +
+      ' | Usaha: ' + esc(o.effort || '-') + ' | Risiko: ' + esc(o.risiko || '-') + '</div>' +
+    (o.aksi && o.aksi.tipe === 'buat_broadcast'
+      ? '<div class="row" style="margin-top:8px">' +
+          '<button class="btn" onclick="draftDariOpsi(' + esc(l.id) + ',' + i + ')">Jadikan draft broadcast</button>' +
+        '</div>'
+      : '') +
+    '</div>').join('');
+
+  document.getElementById('laporanDetail').innerHTML =
+    '<h3>Laporan ' + esc(l.period_start || '-') + ' s/d ' + esc(l.period_end || '-') + '</h3>' +
+    '<p>' + esc(l.ringkasan || '') + '</p>' +
+    (temuan ? '<b>Temuan</b><ul class="kecil">' + temuan + '</ul>' : '') +
+    (opsi ? '<b>Opsi tindakan</b>' + opsi : '');
+}
+
+async function draftDariOpsi(laporanId, indeks) {
+  if (!confirm('Jadikan opsi ini sebagai draft broadcast?\nMasih bisa diubah & harus disetujui sebelum terkirim.')) return;
+  try {
+    const hasil = await api('/api/analytics', {
+      method: 'POST',
+      body: JSON.stringify({ aksi: 'draft-broadcast', laporanId, indeksOpsi: indeks })
+    });
+    alert('Draft campaign #' + hasil.data.id + ' dibuat untuk ' + (hasil.jumlah_target || 0) +
+      ' target. Buka tab Broadcast untuk menyetujui.');
+    switchTab('broadcast');
+  } catch (err) {
+    alert('Gagal: ' + err.message);
+  }
+}
+
+async function kirimLaporanGrup(laporanId) {
+  try {
+    const hasil = await api('/api/analytics', {
+      method: 'POST',
+      body: JSON.stringify({ aksi: 'kirim-grup', laporanId })
+    });
+    pesan('laporanInfo', hasil.message || 'Terkirim ke grup admin.');
+  } catch (err) {
+    pesan('laporanInfo', 'Gagal: ' + err.message, '#dc3545');
+  }
+}
+
 (function init() {
   if (localStorage.getItem('hsf_admin_key') !== null) {
     document.getElementById('adminKey').value = key();

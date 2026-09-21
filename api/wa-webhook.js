@@ -71,6 +71,141 @@ async function sendFonnte(target, message, inboxid) {
   }
 }
 
+// ============================================================
+// Perintah admin lewat grup WhatsApp
+//   SETUJU <id> / TOLAK <id>   -> setujui/batalkan campaign broadcast
+//   !laporan                   -> ringkasan laporan analisis AI terakhir
+//   !status                    -> ringkasan antrean & aturan otomasi
+//   !pause / !aktif            -> matikan/nyalakan semua aturan otomasi
+// Hanya diproses bila pesan datang dari WA_GROUP_ID (grup admin).
+// ============================================================
+function bacaPerintahAdmin(teks) {
+  const upper = String(teks || '').trim().toUpperCase();
+
+  let cocok = upper.match(/^(?:SETUJU|APPROVE|OK)\s+(\d+)$/);
+  if (cocok) return { aksi: 'setujui', arg: cocok[1] };
+
+  cocok = upper.match(/^(?:TOLAK|BATAL|CANCEL)\s+(\d+)$/);
+  if (cocok) return { aksi: 'tolak', arg: cocok[1] };
+
+  if (/^(?:!|#)(?:LAPORAN|REPORT|ANALISIS)$/.test(upper)) return { aksi: 'laporan', arg: '' };
+  if (/^(?:!|#)(?:STATUS|CEK)$/.test(upper)) return { aksi: 'status', arg: '' };
+  if (/^(?:!|#)(?:PAUSE|MATIKAN|STOP OTOMASI)$/.test(upper)) return { aksi: 'matikan', arg: '' };
+  if (/^(?:!|#)(?:AKTIF|NYALAKAN|ON OTOMASI)$/.test(upper)) return { aksi: 'nyalakan', arg: '' };
+
+  return null;
+}
+
+/** Deteksi permintaan berhenti dihubungi dari pelanggan (jadi opt-out). */
+function adalahPermintaanBerhenti(teks) {
+  const t = String(teks || '').trim().toLowerCase();
+  if (!t) return false;
+  if (/^(stop|berhenti|unsubscribe|unsub)\b/.test(t) && t.length <= 40) return true;
+  if (/(jangan|tolong jangan|gausah|gak usah|tidak usah)\s+(kirim|chat|hubungi|spam|wa|whatsapp)/i.test(t)) {
+    return true;
+  }
+  return /hapus nomor/i.test(t);
+}
+
+/**
+ * Jalankan perintah admin dari grup WhatsApp.
+ * Semua operasi di sini cepat (database + 1 balasan), sehingga aman
+ * di dalam batas waktu fungsi webhook (25 detik).
+ */
+async function jalankanPerintahAdmin(perintah, pengirim) {
+  const automationStore = require('../automationStore');
+  const customerStore = require('../customerStore');
+  const waFollowup = require('../waFollowup');
+
+  const namaAdmin = String(pengirim || 'admin').slice(0, 60);
+  const balas = async (teks) => {
+    try {
+      await waGroup.sendToGroup(teks);
+    } catch (err) {
+      console.error('[wa-webhook] gagal membalas grup:', err && err.message);
+    }
+  };
+
+  if (perintah.aksi === 'setujui' || perintah.aksi === 'tolak') {
+    const id = Number(perintah.arg);
+    const campaign = await automationStore.getBroadcast(id);
+    if (!campaign) {
+      await balas('❌ Campaign #' + id + ' tidak ditemukan.');
+      return;
+    }
+
+    if (perintah.aksi === 'tolak') {
+      await automationStore.updateBroadcast(id, { status: 'dibatalkan' });
+      await balas('🚫 Campaign #' + id + ' (*' + campaign.nama + '*) dibatalkan oleh ' + namaAdmin + '.');
+      return;
+    }
+
+    if (['menunggu_approval', 'draft'].indexOf(campaign.status) === -1) {
+      await balas('ℹ️ Campaign #' + id + ' sudah berstatus "' + campaign.status + '".');
+      return;
+    }
+
+    const disetujui = await automationStore.updateBroadcast(id, {
+      status: 'disetujui',
+      approved_by: namaAdmin,
+      approved_at: new Date().toISOString()
+    });
+
+    const susun = await waFollowup.susunBroadcastCampaign(disetujui);
+    await customerStore.enqueueOutbox(susun.items);
+    await automationStore.updateBroadcast(id, { total_target: susun.items.length });
+
+    await balas(
+      '✅ Campaign #' + id + ' (*' + campaign.nama + '*) disetujui oleh ' + namaAdmin + '.\n' +
+      'Target: ' + susun.items.length + ' pelanggan (hanya yang bersedia dihubungi).\n' +
+      'Dikirim otomatis pada 10.00 WIB berikutnya, atau tekan "Kirim" di dashboard admin.'
+    );
+    return;
+  }
+
+  if (perintah.aksi === 'laporan') {
+    const laporan = await automationStore.getLatestReport();
+    if (!laporan) {
+      await balas('Belum ada laporan analisis. Buka dashboard admin → tab Laporan AI → "Buat laporan sekarang".');
+      return;
+    }
+    // eslint-disable-next-line global-require
+    await balas(require('../analyst').teksLaporanWhatsApp(laporan));
+    return;
+  }
+
+  if (perintah.aksi === 'status') {
+    const [antrean, rules] = await Promise.all([
+      customerStore.outboxSummary(),
+      automationStore.getRules()
+    ]);
+    const aktif = rules.filter((r) => r.is_on).map((r) => r.key).join(', ') || 'tidak ada';
+
+    await balas(
+      '📦 *Status Otomasi Eva*\n' +
+      '• Antrean menunggu: ' + (antrean.queued || 0) + '\n' +
+      '• Total terkirim: ' + (antrean.sent || 0) + '\n' +
+      '• Gagal: ' + (antrean.failed || 0) + '\n' +
+      '• Aturan aktif: ' + aktif
+    );
+    return;
+  }
+
+  if (perintah.aksi === 'matikan' || perintah.aksi === 'nyalakan') {
+    const nyalakan = perintah.aksi === 'nyalakan';
+    const rules = await automationStore.getRules();
+
+    for (const rule of rules) {
+      if (rule.is_on === nyalakan) continue;
+      await automationStore.updateRule(rule.key, { is_on: nyalakan });
+    }
+
+    await balas(nyalakan
+      ? '▶️ Semua otomasi Eva DIAKTIFKAN oleh ' + namaAdmin + '.'
+      : '⏸️ Semua otomasi Eva DIMATIKAN oleh ' + namaAdmin + ' (chat pelanggan tetap dibalas).');
+  }
+}
+
 module.exports = async function handler(req, res) {
   // GET = pengecekan URL webhook saat setup di dashboard Fonnte
   if (req.method === 'GET') {
@@ -108,10 +243,46 @@ module.exports = async function handler(req, res) {
   let message = String(body.message || body.text || '').trim();
   const mediaUrl = String(body.url || body.media || '').trim();
 
+  // ---- Perintah admin dari grup (diproses sebelum filter nomor) ----
+  const grupAdmin = (process.env.WA_GROUP_ID || '').trim();
+  const dariGrupAdmin = Boolean(grupAdmin) && sender === grupAdmin;
+  const perintah = bacaPerintahAdmin(message);
+
+  if (perintah) {
+    if (!dariGrupAdmin) return ack();   // perintah hanya sah dari grup admin
+    try {
+      await jalankanPerintahAdmin(perintah, member || name || 'admin');
+    } catch (err) {
+      console.error('[wa-webhook] perintah admin gagal:', err && err.message);
+    }
+    return ack();
+  }
+
   // ---- Guard dasar: abaikan hal-hal yang tidak perlu dibalas ----
   if (!sender || !/^\d{8,20}$/.test(sender)) return ack();
   if (member) return ack();                       // pesan grup -> abaikan
   if (device && sender === device) return ack();  // pesan sendiri/echo -> abaikan
+
+  // ---- Pelanggan minta berhenti dihubungi -> matikan otomasi untuk nomor ini ----
+  if (adalahPermintaanBerhenti(message)) {
+    const customerStore = require('../customerStore');
+    try {
+      await customerStore.setOptIn(sender, false, 'Permintaan berhenti: ' + message.slice(0, 200));
+    } catch (err) {
+      console.error('[wa-webhook] gagal menyimpan opt-out:', err && err.message);
+    }
+    try {
+      const balas = 'Baik Kak, mohon maaf atas ketidaknyamanannya 🙏 Nomor Kakak sudah kami ' +
+        'keluarkan dari daftar promosi. Untuk booking atau pertanyaan layanan, Kakak tetap ' +
+        'bisa chat di nomor ini ya.';
+      await waStore.saveMessage(sender, 'customer', message);
+      await waStore.saveMessage(sender, 'eva', balas);
+      await sendFonnte(sender, balas, inboxid);
+    } catch (err) {
+      console.error('[wa-webhook] balasan opt-out gagal:', err && err.message);
+    }
+    return ack();
+  }
 
   // ---- Media (foto bukti transfer, dll.) -> teruskan ke grup admin ----
   if (mediaUrl) {

@@ -1,6 +1,17 @@
 {
   "$schema": "https://vercel.com/schema/vercel.json",
   "outputDirectory": "public",
+  "crons": [
+    { "path": "/api/cron/daily", "schedule": "0 3 * * *" },
+    { "path": "/api/cron/weekly", "schedule": "0 3 * * 1" }
+  ],
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "admin.homespafamily.my.id" }],
+      "destination": "/admin.html"
+    }
+  ],
   "functions": {
     "api/*.js": {
       "maxDuration": 25
@@ -10,6 +21,9 @@
     },
     "api/booking/*/*.js": {
       "maxDuration": 25
+    },
+    "api/cron/*.js": {
+      "maxDuration": 60
     }
   }
 }

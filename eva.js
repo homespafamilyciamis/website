@@ -168,13 +168,9 @@ PEMBAYARAN (jawab HANYA dengan data ini, jangan mengarang)
 - Bukti transfer dikirim pelanggan ke chat ini, admin verifikasi, jadwal langsung dikunci.
 `;
 
-// Daftar model sama persis dengan api/chat.js (fallback berurutan)
-const GEMINI_MODELS = [
-  'gemini-3.8-flash',
-  'gemini-3.7-flash',
-  'gemini-3.6-flash',
-  'gemini-3.5-flash'
-];
+// Pemanggilan Gemini dipusatkan di geminiClient.js (dipakai bersama analyst.js).
+// Daftar model fallback tetap sama persis dengan api/chat.js.
+const { GEMINI_MODELS, generateText } = require('./geminiClient');
 
 const FALLBACK_REPLY =
   'Maaf Kak, Eva sedang mengalami kendala teknis untuk menjawab sekarang. 🙏 ' +
@@ -223,62 +219,15 @@ async function generateEvaReply({
   }
   contents.push({ role: 'user', parts: [{ text: String(message || '').trim() }] });
 
-  let lastError = '';
+  const result = await generateText({
+    apiKey,
+    systemPrompt: EVA_SYSTEM_PROMPT,
+    contents,
+    timeoutMs,
+    maxOutputTokens
+  });
 
-  for (const model of GEMINI_MODELS) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-
-    try {
-      const endpoint =
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-goog-api-key': apiKey
-        },
-        body: JSON.stringify({
-          systemInstruction: {
-            parts: [{ text: EVA_SYSTEM_PROMPT }]
-          },
-          contents,
-          generationConfig: {
-            maxOutputTokens,
-            thinkingConfig: {
-              thinkingLevel: 'low'
-            }
-          }
-        }),
-        signal: controller.signal
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        const reply = data.candidates?.[0]?.content?.parts
-          ?.map(part => part.text || '')
-          .join('')
-          .trim();
-
-        if (reply) {
-          return { reply, model, error: '' };
-        }
-      }
-
-      lastError = data.error?.message || `Gemini API error (${response.status})`;
-    } catch (err) {
-      lastError =
-        err && err.name === 'AbortError'
-          ? 'Timeout layanan AI'
-          : ((err && err.message) || 'Koneksi ke layanan AI gagal');
-    } finally {
-      clearTimeout(timer);
-    }
-  }
-
-  return { reply: '', model: '', error: lastError };
+  return { reply: result.text, model: result.model, error: result.error };
 }
 
 module.exports = {

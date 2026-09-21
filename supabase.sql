@@ -68,6 +68,7 @@ create or replace function public.hsf_normalize_wa(p text)
 returns text
 language sql
 immutable
+set search_path = public, pg_temp
 as $fn$
   select case
     when p is null then null

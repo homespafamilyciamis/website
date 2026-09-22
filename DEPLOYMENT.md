@@ -24,11 +24,12 @@ Buka project → **Settings → Environment Variables**, tambahkan:
 | Key | Nilai | Keterangan |
 |---|---|---|
 | `GEMINI_API_KEY` | (kunci Gemini Anda) | Sudah ada — jangan diubah. Dipakai `api/chat.js` (Eva). |
-| `SUPABASE_URL` | `https://kyxqufvwvofdaohqlknf.supabase.co` | Dipakai `bookingStore.js`. |
-| `SUPABASE_ANON_KEY` | `sb_publishable_rtYWrrHVTHa01NoLU1OV2A_Alazj31d` | Atau `SUPABASE_SERVICE_ROLE_KEY` bila ada (lebih aman untuk backend). |
+| `SUPABASE_URL` | `https://kyxqufvwvofdaohqlknf.supabase.co` | Dipakai semua store (`bookingStore.js`, dll). |
+| `SUPABASE_SERVICE_ROLE_KEY` | (secret — dari Supabase Dashboard → Settings → API) | **WAJIB.** RLS aktif di semua tabel; hanya service_role yang bisa akses dari backend. |
 | `ADMIN_KEY` | `e50f53aa53d13d69ad6dff1ac0b7a0b8522653a17d371050` | Kunci login `/admin`. Samakan dengan `.env` lokal. |
 | `WHATSAPP_NUMBER` | `6285126246175` | Nomor admin untuk link WA. |
 | `NODE_ENV` | `production` | Standar. |
+| `SUPABASE_ANON_KEY` | (lama) | Tidak dipakai lagi oleh backend — RLS aktif membuat anon key tidak punya akses. Biarkan saja. |
 
 > Nilai `SUPABASE_*` dan `ADMIN_KEY` di atas sama persis dengan `.env` lokal
 > (file `.env` TIDAK ikut commit — hanya `.env.example` yang ada di git).
@@ -145,6 +146,8 @@ vercel --prod
 | Tab Pelanggan/Follow-up error "Could not find the table" | Tabel otomasi belum dibuat di Supabase | Jalankan `supabase.sql` (Bagian D1), cek Table Editor. |
 | `admin.homespafamily.my.id` → 404 DEPLOYMENT_NOT_FOUND | Domain belum ditambahkan di Vercel | Vercel → Settings → Domains → Add (Bagian D3). |
 | `/api/cron/daily` → 401 Unauthorized | `CRON_SECRET` salah/kosong di Vercel | Samakan secret di Vercel dengan yang dipakai memanggil (Bagian D2). |
+| Form booking gagal / `/admin` kosong setelah hardening RLS | Backend masih memakai anon key | Pasang `SUPABASE_SERVICE_ROLE_KEY` di Vercel → Redeploy (Bagian B). RLS menolak anon key. |
+| RLS "new row violates row-level security" | Backend belum memakai service_role | Sama seperti di atas — ini perilaku benar, bukan bug. |
 | Tidak ada pesan terkirim padahal aturan ON | Di luar jam aman 08-20 WIB, atau pelanggan belum opt-in / sudah kirim pesan hari ini | Cek tab Follow-up → riwayat antrean (status `queued`/`skipped`) & ringkasan cron. |
 
 ## Support

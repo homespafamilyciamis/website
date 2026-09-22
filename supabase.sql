@@ -450,3 +450,85 @@ grant select on public.v_jam_sibuk to anon, authenticated, service_role;
 grant select on public.v_pelanggan_ringkas to anon, authenticated, service_role;
 
 grant usage, select on all sequences in schema public to anon, authenticated, service_role;
+
+-- ============================================================
+-- 10) HARDENING KEAMANAN (RLS aktif + API publik terkunci)
+--
+-- SYARAT WAJIB: backend (Vercel) WAJIB memakai
+-- SUPABASE_SERVICE_ROLE_KEY (lihat DEPLOYMENT.md). service_role
+-- bypass RLS, jadi backend tetap akses penuh, sementara API publik
+-- (anon key) tidak bisa baca/menulis apa pun.
+-- Semua statement di bagian ini idempotent (aman dijalankan ulang).
+-- ============================================================
+
+-- 10a) View berjalan sebagai pemanggil + tanpa akses publik
+alter view public.v_omset_harian set (security_invoker = true);
+alter view public.v_layanan_tren set (security_invoker = true);
+alter view public.v_jam_sibuk set (security_invoker = true);
+alter view public.v_pelanggan_ringkas set (security_invoker = true);
+
+revoke select on public.v_omset_harian from anon, authenticated;
+revoke select on public.v_layanan_tren from anon, authenticated;
+revoke select on public.v_jam_sibuk from anon, authenticated;
+revoke select on public.v_pelanggan_ringkas from anon, authenticated;
+
+-- 10b) Fungsi hsf_* tanpa EXECUTE publik (pemicu trigger tetap jalan;
+--      Postgres tidak memeriksa EXECUTE saat trigger dijalankan)
+revoke execute on function public.hsf_normalize_wa(text) from public, anon, authenticated;
+revoke execute on function public.hsf_recalc_customer(text) from public, anon, authenticated;
+revoke execute on function public.hsf_refresh_segments() from public, anon, authenticated;
+revoke execute on function public.hsf_trg_booking_sync() from public, anon, authenticated;
+revoke execute on function public.hsf_trg_chat_sync() from public, anon, authenticated;
+
+grant execute on function public.hsf_normalize_wa(text) to service_role;
+grant execute on function public.hsf_recalc_customer(text) to service_role;
+grant execute on function public.hsf_refresh_segments() to service_role;
+grant execute on function public.hsf_trg_booking_sync() to service_role;
+grant execute on function public.hsf_trg_chat_sync() to service_role;
+
+-- 10c) RLS AKTIF di semua tabel — TANPA policy untuk anon/authenticated.
+--      Artinya: API publik (anon key) = nol akses. Backend (service_role)
+--      bypass RLS = akses penuh. Jangan menambah policy untuk anon.
+alter table public.bookings enable row level security;
+alter table public.wa_messages enable row level security;
+alter table public.customers enable row level security;
+alter table public.wa_outbox enable row level security;
+alter table public.broadcasts enable row level security;
+alter table public.analytics_reports enable row level security;
+alter table public.automation_rules enable row level security;
+
+-- 10d) Tabel keuangan (di luar otomasi) ikut dikunci
+alter table public.jurnal_kas_harian enable row level security;
+alter table public.transaksi_tamu enable row level security;
+alter table public.pengeluaran_ops enable row level security;
+alter table public.riwayat_pembayaran_gaji enable row level security;
+
+-- 10e) Cabut semua hak tabel dari anon/authenticated (defense in depth)
+revoke all on public.bookings from anon, authenticated;
+revoke all on public.wa_messages from anon, authenticated;
+revoke all on public.customers from anon, authenticated;
+revoke all on public.wa_outbox from anon, authenticated;
+revoke all on public.broadcasts from anon, authenticated;
+revoke all on public.analytics_reports from anon, authenticated;
+revoke all on public.automation_rules from anon, authenticated;
+revoke all on public.jurnal_kas_harian from anon, authenticated;
+revoke all on public.transaksi_tamu from anon, authenticated;
+revoke all on public.pengeluaran_ops from anon, authenticated;
+revoke all on public.riwayat_pembayaran_gaji from anon, authenticated;
+
+-- Sequence hanya untuk service_role (identity columns wa_outbox/customers)
+grant usage, select on all sequences in schema public to service_role;
+
+-- ROLLBACK darurat (jalankan hanya jika backend belum pakai service_role):
+--   alter table public.bookings disable row level security;
+--   alter table public.wa_messages disable row level security;
+--   alter table public.customers disable row level security;
+--   alter table public.wa_outbox disable row level security;
+--   alter table public.broadcasts disable row level security;
+--   alter table public.analytics_reports disable row level security;
+--   alter table public.automation_rules disable row level security;
+--   alter table public.jurnal_kas_harian disable row level security;
+--   alter table public.transaksi_tamu disable row level security;
+--   alter table public.pengeluaran_ops disable row level security;
+--   alter table public.riwayat_pembayaran_gaji disable row level security;
+--   grant select, insert, update, delete on all tables in schema public to anon;

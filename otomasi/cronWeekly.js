@@ -1,5 +1,6 @@
 // ============================================================
-// Vercel Cron: GET /api/cron/weekly
+// LOGIKA CRON: /api/cron/weekly
+// Dipanggil oleh fungsi catch-all: api/cron/[...job].js
 // Dijadwalkan setiap Senin 03:00 UTC = 10:00 WIB (lihat vercel.json).
 //
 // Tugas: kumpulkan metrik nyata (omset, layanan, jam kosong, pelanggan,
@@ -8,9 +9,9 @@
 //
 // Uji manual: /api/cron/weekly?secret=<CRON_SECRET>
 // ============================================================
-const analyst = require('../../analyst');
-const waGroup = require('../../waGroup');
-const { cekCron } = require('../../apiGuard');
+const analyst = require('../analyst');
+const waGroup = require('../waGroup');
+const { cekCron } = require('../apiGuard');
 
 module.exports = async function handler(req, res) {
   if (!cekCron(req)) {

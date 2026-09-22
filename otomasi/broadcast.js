@@ -1,5 +1,6 @@
 // ============================================================
-// Vercel Serverless: /api/broadcast  (butuh ADMIN_KEY)
+// LOGIKA ENDPOINT /api/otomasi/broadcast   (butuh ADMIN_KEY)
+// Dipanggil oleh fungsi catch-all: api/otomasi/[...aksi].js
 //
 // GET                                             -> daftar campaign
 // POST { aksi:'pratinjau', pesan, filter }        -> hitung target + contoh pesan

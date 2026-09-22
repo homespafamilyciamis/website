@@ -22,8 +22,10 @@ laporkan(true, 'modul dimuat');
 // 2) Properti modul yang dipakai di semua berkas benar-benar ada
 const berkasDiperiksa = [
   'customerStore.js', 'automationStore.js', 'waFollowup.js', 'waBlast.js', 'analyst.js',
-  'apiGuard.js', 'api/wa-webhook.js', 'api/customers.js', 'api/broadcast.js',
-  'api/automation.js', 'api/analytics.js', 'api/cron/daily.js', 'api/cron/weekly.js'
+  'apiGuard.js', 'api/wa-webhook.js',
+  'api/otomasi/[...aksi].js', 'api/cron/[...job].js',
+  'otomasi/customers.js', 'otomasi/broadcast.js', 'otomasi/automation.js',
+  'otomasi/analytics.js', 'otomasi/cronDaily.js', 'otomasi/cronWeekly.js'
 ];
 
 berkasDiperiksa.forEach((berkas) => {

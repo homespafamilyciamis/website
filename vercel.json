@@ -22,6 +22,9 @@
     "api/booking/*/*.js": {
       "maxDuration": 25
     },
+    "api/otomasi/*.js": {
+      "maxDuration": 25
+    },
     "api/cron/*.js": {
       "maxDuration": 60
     }

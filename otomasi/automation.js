@@ -1,5 +1,6 @@
 // ============================================================
-// Vercel Serverless: /api/automation  (butuh ADMIN_KEY)
+// LOGIKA ENDPOINT /api/otomasi/automation   (butuh ADMIN_KEY)
+// Dipanggil oleh fungsi catch-all: api/otomasi/[...aksi].js
 //
 // GET                                    -> daftar aturan otomasi
 // POST { key, is_on, config }            -> nyalakan/matikan atau ubah setelan

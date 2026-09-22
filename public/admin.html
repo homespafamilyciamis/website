@@ -353,10 +353,29 @@ const WARNA_STATUS = {
 };
 const WARNA_SEGMEN = { baru: '#17a2b8', hangat: '#ffc107', aktif: '#28a745', pasif: '#8a7c64' };
 
+// URL endpoint otomasi dipetakan ke satu fungsi catch-all di Vercel
+// (/api/otomasi/<aksi>) agar hemat batas Serverless Function paket Hobby.
+const BASE_OTOMASI = {
+  '/api/customers': '/api/otomasi/customers',
+  '/api/broadcast': '/api/otomasi/broadcast',
+  '/api/automation': '/api/otomasi/automation',
+  '/api/analytics': '/api/otomasi/analytics'
+};
+
+function petakanApi(path) {
+  const rute = String(path || '');
+  for (const lama of Object.keys(BASE_OTOMASI)) {
+    if (rute === lama || rute.startsWith(lama + '?')) {
+      return BASE_OTOMASI[lama] + rute.slice(lama.length);
+    }
+  }
+  return rute;
+}
+
 async function api(path, options) {
   const opt = Object.assign({ method: 'GET' }, options || {});
   opt.headers = Object.assign(headers(), opt.headers || {});
-  const res = await fetch(path, opt);
+  const res = await fetch(petakanApi(path), opt);
   const data = await res.json().catch(() => ({}));
   if (!res.ok || data.success === false) {
     throw new Error(data.message || ('Gagal memuat (' + res.status + ')'));

@@ -1,5 +1,6 @@
 // ============================================================
-// Vercel Serverless: /api/customers  (butuh ADMIN_KEY)
+// LOGIKA ENDPOINT /api/otomasi/customers   (butuh ADMIN_KEY)
+// Dipanggil oleh fungsi catch-all: api/otomasi/[...aksi].js
 //
 // GET  ?segmen=pasif&q=cari&limit=200   -> daftar pelanggan + ringkasan
 // GET  ?outbox=1&status=failed          -> riwayat antrean pesan otomatis

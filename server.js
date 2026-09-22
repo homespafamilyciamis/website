@@ -342,13 +342,10 @@ app.get('/api/stats', requireAdmin, async (req, res) => {
 
 // ---- Otomasi Eva: endpoint admin & cron (logika sama dengan versi Vercel) ----
 // Dipasang sebagai handler Express agar bisa diuji lokal lewat `npm start`.
+// Di Vercel, keduanya adalah 1 fungsi catch-all (hemat batas paket Hobby).
 [
-  ['/api/customers', './api/customers'],
-  ['/api/broadcast', './api/broadcast'],
-  ['/api/automation', './api/automation'],
-  ['/api/analytics', './api/analytics'],
-  ['/api/cron/daily', './api/cron/daily'],
-  ['/api/cron/weekly', './api/cron/weekly']
+  ['/api/otomasi/:aksi', './api/otomasi/[...aksi]'],
+  ['/api/cron/:job', './api/cron/[...job]']
 ].forEach(function (pasangan) {
   app.all(pasangan[0], function (req, res, next) {
     Promise.resolve(require(pasangan[1])(req, res)).catch(next);

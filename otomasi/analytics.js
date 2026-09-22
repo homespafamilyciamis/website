@@ -1,5 +1,6 @@
 // ============================================================
-// Vercel Serverless: /api/analytics  (butuh ADMIN_KEY)
+// LOGIKA ENDPOINT /api/otomasi/analytics   (butuh ADMIN_KEY)
+// Dipanggil oleh fungsi catch-all: api/otomasi/[...aksi].js
 //
 // GET                                    -> daftar laporan analisis AI
 // GET  ?id=12                            -> detail 1 laporan

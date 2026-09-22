@@ -1,5 +1,6 @@
 // ============================================================
-// Vercel Cron: GET /api/cron/daily
+// LOGIKA CRON: /api/cron/daily
+// Dipanggil oleh fungsi catch-all: api/cron/[...job].js
 // Dijadwalkan setiap hari 03:00 UTC = 10:00 WIB (lihat vercel.json).
 //
 // Tugas: susun follow-up (3 hari, reaktivasi, reminder H-1, broadcast
@@ -12,9 +13,9 @@
 // Uji manual (tanpa mengirim apa pun):
 //   /api/cron/daily?dryRun=1&secret=<CRON_SECRET>
 // ============================================================
-const waFollowup = require('../../waFollowup');
-const waGroup = require('../../waGroup');
-const { cekCron } = require('../../apiGuard');
+const waFollowup = require('../waFollowup');
+const waGroup = require('../waGroup');
+const { cekCron } = require('../apiGuard');
 
 module.exports = async function handler(req, res) {
   if (!cekCron(req)) {

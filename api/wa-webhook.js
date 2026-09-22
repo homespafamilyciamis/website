@@ -319,8 +319,14 @@ module.exports = async function handler(req, res) {
       return ack();
     }
 
-    // Simpan pesan pelanggan
-    const saved = await waStore.saveMessage(sender, 'customer', message);
+    // Simpan pesan pelanggan — kegagalan simpan (mis. RLS/belum service_role)
+    // TIDAK boleh mematikan balasan Eva.
+    let saved = null;
+    try {
+      saved = await waStore.saveMessage(sender, 'customer', message);
+    } catch (err) {
+      console.error('[wa-webhook] gagal simpan pesan (balasan tetap jalan):', err && err.message);
+    }
     console.log(
       `[wa-webhook] chat ${maskNumber(sender)}${name ? ' (' + name.slice(0, 20) + ')' : ''} ` +
       `len=${message.length}`
